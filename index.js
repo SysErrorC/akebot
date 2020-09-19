@@ -67,7 +67,7 @@ client.on('message', message => {
 
 		message.channel.send(`${query} isn't one of the waifus in my database, you shitty admiral!`);
 	} else if (command === 'headpat') {
-		message.channel.send("H-hey! Where do you think you're touching, you... shitty... admiral...");
+		message.channel.send("H-hey! Where do you think you're touching, you shitty... admiral...");
 	}
 });
 
