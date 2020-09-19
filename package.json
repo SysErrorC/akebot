@@ -1,0 +1,17 @@
+{
+  "name": "akebot",
+  "version": "0.0.1",
+  "description": "I find pictures of your waifus, you shitty admiral!",
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "^12.3.1",
+    "eslint": "^7.9.0",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Cult of Zuiun",
+  "license": "ISC"
+}
