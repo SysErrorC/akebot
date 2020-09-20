@@ -1,7 +1,7 @@
 const { prefix, token } = require ("./config.json");
 const database = require ("./database.json");
 const aliases = require ("./aliases.json");
-const insults = require ("./insults.json");
+const extras = require ("./extras.json");
 const ytdlInfo = require ("ytdl-getinfo");
 const Discord = require ("discord.js");
 const client = new Discord.Client ();
@@ -44,7 +44,7 @@ client.on ("message", message => {
 
 	if (command === "help") {
 		if (! arguments.length) {
-			message.channel.send (`Special-type destroyer number 18, 8th of the Ayanami-class, Akebono. My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use **${prefix}help command_name** to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}waifu\n${prefix}list\n${prefix}play\n${prefix}search\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!\nIf you want to contact my shitty admiral to offer suggestions, report bugs, or offer waifu pictures, join my support server at https://discord.gg/hFQQEcZ, you equally shitty admiral! If you want to examine me, you can go to my GitHub at https://github.com/zuiun/akebot, you perverted admiral!`);
+			message.channel.send (`Special-type destroyer number 18, 8th of the Ayanami-class, Akebono. My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use **${prefix}help command_name** to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}waifu\n${prefix}list\n${prefix}8ball\n${prefix}play\n${prefix}search\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!\nIf you want to contact my shitty admiral to offer suggestions, report bugs, or offer waifu pictures, join my support server at https://discord.gg/hFQQEcZ, you equally shitty admiral! If you want to examine me, you can go to my GitHub at https://github.com/zuiun/akebot, you perverted admiral!`);
 		} else {
 			var query = `${prefix}${arguments [0]}`
 
@@ -54,6 +54,8 @@ client.on ("message", message => {
 				message.channel.send (`Why are you so interested in other girls, huh? If you're so needy, you can use **${query} name** to get a picture of your waifu, you perverted admiral! If you don't care who you get, you can use **${query} random**, you shitty admiral!`);
 			} else if (arguments [0] === "list") {
 				message.channel.send (`How disgusting! Are you keeping a track of your waifus using **${query}**!? You perverted admiral!`);
+			} else if (arguments [0] === "8ball") {
+				message.channel.send (``);
 			} else if (arguments [0] === "play") {
 				message.channel.send (`Your music is annoying! Why would anybody let you use **${query} youtube_query** to play music, huh!? You shitty admiral!`);
 			} else if (arguments [0] === "search") {
@@ -88,7 +90,11 @@ client.on ("message", message => {
 		}
 
 		message.channel.send (list);
-	}else if (command === "headpat") {
+	} else if (command === "8ball" || command === "aniball") {
+		const response = Math.floor (Math.random () * extras ["8ball"].length);
+		message.channel.send (extras ["8ball"] [response] [0]);
+		message.channel.send (extras ["8ball"] [response] [1]);
+	} else if (command === "headpat") {
 		message.channel.send ("Ju-just this once, okay? You shitty admiral...");
 		message.channel.send ("https://cdn.donmai.us/original/66/3d/__admiral_and_akebono_kantai_collection_drawn_by_max_melon__663d2e79b9ca0c5a8ae869ee735f7e9d.jpg");
 	} else if (command === "explosion") {
@@ -122,7 +128,7 @@ client.on ("message", message => {
 	} else if (command === "rickroll") {
 		message.channel.send ("https://i.imgur.com/yed5Zfk.gif");
 	} else if (command === "baka") {
-		message.channel.send (insults ["insults"] [Math.floor (Math.random () * insults ["insults"].length)].replace ("${NAME}", `<@${message.author.id}>`));
+		message.channel.send (extras ["insults"] [Math.floor (Math.random () * extras ["insults"].length)].replace ("${NAME}", `<@${message.author.id}>`));
 	} else {
 		message.channel.send (`**${prefix}${command}** isn't one of my commands, you stupid admiral!`);
 	}
