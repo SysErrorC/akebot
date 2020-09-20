@@ -6,6 +6,7 @@ const ytdlInfo = require ("ytdl-getinfo");
 const Discord = require ("discord.js");
 const client = new Discord.Client ();
 
+const waitTime = 10000;
 var connection;
 var queue = [];
 var random = [];
@@ -14,7 +15,7 @@ var index = 0;
 var loopState = 0;
 
 client.once ("ready", () => {
-	client.user.setPresence ({ activity: { name: `Use ${prefix}help if you need me, you shitty admiral!` } });
+	client.user.setActivity (`Use ${prefix}help if you need me, you shitty admiral!`);
 
 	for (var i in database) {
 		for (var j in database [i]) {
@@ -43,18 +44,20 @@ client.on ("message", message => {
 
 	if (command === "help") {
 		if (! arguments.length) {
-			message.channel.send (`My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use ${prefix}help command_name to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}waifu\n${prefix}list\n${prefix}play\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!`);
+			message.channel.send (`Special-type destroyer number 18, 8th of the Ayanami-class, Akebono. My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use **${prefix}help command_name** to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}waifu\n${prefix}list\n${prefix}play\n${prefix}search\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!\nIf you want to contact my shitty admiral to offer suggestions, report bugs, or offer waifu pictures, join my support server at https://discord.gg/hFQQEcZ, you equally shitty admiral! If you want to examine me, you can go to my GitHub at https://github.com/zuiun/akebot, you perverted admiral!`);
 		} else {
 			var query = `${prefix}${arguments [0]}`
 
 			if (arguments [0] === "help") {
 				message.channel.send (`Huh? Are you an idiot? **${query}** just tells you my commands! **Bolded phrases** are commands, while [bracketed arguments] are optional, you stupid admiral!`);
 			} else if (arguments [0] === "waifu") {
-				message.channel.send (`Why are you so interested in other girls, huh? If you're so needy, you can use **${query} name** to get a picture of your waifu, you perverted admiral!`);
+				message.channel.send (`Why are you so interested in other girls, huh? If you're so needy, you can use **${query} name** to get a picture of your waifu, you perverted admiral! If you don't care who you get, you can use **${query} random**, you shitty admiral!`);
 			} else if (arguments [0] === "list") {
 				message.channel.send (`How disgusting! Are you keeping a track of your waifus using **${query}**!? You perverted admiral!`);
 			} else if (arguments [0] === "play") {
 				message.channel.send (`Your music is annoying! Why would anybody let you use **${query} youtube_query** to play music, huh!? You shitty admiral!`);
+			} else if (arguments [0] === "search") {
+				message.channel.send (`Wow, now you can pick and choose what you want to annoy me with using **${query} youtube_query** and then typing a song number afterwards. You shitty admiral!\nThis command currently doesn't work as intended and will only give 2 search results instead of 10`);
 			} else if (arguments [0] === "info") {
 				message.channel.send (`Are you so inept that you need to use **${query} [song_index]** to find information about the current song or a song at a given index? You stupid admiral!`);
 			} else if (arguments [0] === "move") {
@@ -62,7 +65,7 @@ client.on ("message", message => {
 			} else if (arguments [0] === "swap") {
 				message.channel.send (`Since you somehow mistook two completely different songs, you can use **${query} song_one_index song_two_index** to swap two songs' position on the queue, you shitty admiral!`);
 			} else if (arguments [0] === "skip") {
-				message.channel.send (`Since you apparently didn't already know, you can use **${query} [song_index]** to skip to a different song on the queue, you stupid admiral!`);
+				message.channel.send (`Since you apparently didn't already know, you can use **${query} [song_index]** to skip to the next song or to a different song on the queue, you stupid admiral!`);
 			} else if (arguments [0] === "remove") {
 				message.channel.send (`If you'd like to spare my ears from your torture, you can use **${query} song_index** to remove a specific song from the queue, but you'd never do that, you shitty admiral!`);
 			} else if (arguments [0] === "stop") {
@@ -86,14 +89,20 @@ client.on ("message", message => {
 
 		message.channel.send (list);
 	}else if (command === "headpat") {
-		message.channel.send ("H-hey! Where do you think you're touching, you shitty... admiral...");
+		message.channel.send ("Ju-just this once, okay? You shitty admiral...");
+		message.channel.send ("https://cdn.donmai.us/original/66/3d/__admiral_and_akebono_kantai_collection_drawn_by_max_melon__663d2e79b9ca0c5a8ae869ee735f7e9d.jpg");
 	} else if (command === "explosion") {
-		message.channel.send ("https://media.tenor.com/images/f0f5cd220ef082c4a9b9cc30bcdbd45c/tenor.gif")
+		message.channel.send ("THE TIME OF RECKONING HAS COME. GOODBYE, YOU SHITTY ADMIRAL.");
+		message.channel.send ("https://media.tenor.com/images/f0f5cd220ef082c4a9b9cc30bcdbd45c/tenor.gif");
 	} else if (command === "cheer") {
+		message.channel.send ("This is Shikinami, a fellow special-type destroyer and a colleague of mine. If you touch her, I'll kill you, you perverted admiral!");
 		message.channel.send ("https://cdn.donmai.us/original/43/c0/__shikinami_kantai_collection_drawn_by_onio__43c00ac5e146da1b20b54fa32791b3d9.gif");
 	} else if (command === "play") {
 		const query = `${arguments.join (" ")}`;
-		execute (query, message);
+		execute (query, message, false);
+	} else if (command === "search") {
+		const query = `${arguments.join (" ")}`;
+		execute (query, message, true);
 	} else if (command === "info") {
 		info (arguments [0], message);
 	} else if (command === "move") {
@@ -107,22 +116,7 @@ client.on ("message", message => {
 	} else if (command === "stop") {
 		stop (message);
 	} else if (command === "queue") {
-		var i, list = `This is the current queue, you shitty admiral!\n`;
-
-		if (queue.length === 0) {
-			message.channel.send ("The queue is empty, you stupid admiral!");
-			return;
-		}
-
-		for (i = 0; i < queue.length; i ++) {
-			if (i === index) {
-				list += `[Current] `;
-			}
-
-			list += `${i + 1} - ${queue [i].title} (${queue [i].length})\n`;
-		}
-
-		message.channel.send (list);
+		listQueue (message, queue, false);
 	} else if (command === "loop") {
 		loop (message);
 	} else if (command === "rickroll") {
@@ -178,7 +172,7 @@ function waifu (query, message) {
 	message.channel.send (`**${query}** isn't one of the waifus in my database, you shitty admiral!`);
 }
 
-async function execute (query, message) {
+async function execute (query, message, search) {
 	const voiceChannel = message.member.voice.channel;
 
 	if (! voiceChannel) {
@@ -200,19 +194,82 @@ async function execute (query, message) {
 		return;
 	}
 
-	message.channel.send (`I am currently searching for **${query}**, you shitty admiral!`);
+	message.channel.send (`I'm currently searching for **${query}**, you shitty admiral!`);
+	const info = await ytdlInfo.getInfo (query, ["--default-search=ytsearch10", "-i", "--format=best"]);
 
-	const info = await ytdlInfo.getInfo (query);
-	const song = {
-		title: info.items [0].title,
-		url: info.items [0].url,
-		id: info.items [0].id,
-		length: timestamp (parseInt (info.items [0].duration) * 1000)
-	};
+	if (search) {
+		const songs = [];
+		var i;
 
+		for (i = 0; i < 10 && i < info.items.length; i ++) {
+			songs.push ({
+				title: info.items [i].title,
+				url: info.items [i].url,
+				id: info.items [i].id,
+				length: timestamp (parseInt (info.items [i].duration) * 1000)
+			})
+		}
+
+		listQueue (message, songs, true);
+
+		const collector = message.channel.createMessageCollector (response => response.author.id === message.author.id, { time: waitTime });
+
+		message.channel.send (`You have ${waitTime / 1000} seconds to make a choice, you shitty admiral!`);
+        collector.on ("collect", response => {
+			var index = parseInt (response, 10);
+
+			if (isNaN (index)) {
+				response.channel.send (`**${response}** isn't a valid index, you stupid admiral!`);
+			} else if (index < 1 || index > songs.length) {
+				response.channel.send (`**${response}** isn't inside the queue, you stupid admiral!`);
+			} else {
+				index --;
+				const song = {
+					title: songs [index].title,
+					url: songs [index].url,
+					id: songs [index].id,
+					length: songs [index].length
+				};
+				addSong (message, song);
+				collector.stop ();
+			}
+		})
+		collector.on ("end", collected => {
+			message.channel.send ("I've stopped listening for a song choice, you shitty admiral!");
+		});
+	} else {
+		const song = {
+			title: info.items [0].title,
+			url: info.items [0].url,
+			id: info.items [0].id,
+			length: timestamp (parseInt (info.items [0].duration) * 1000)
+		};
+		addSong (message, song);
+	}
+}
+
+function timestamp (ms) {
+	const unconvertedTime = [ Math.floor (ms / 1000 / 60), Math.floor (ms / 1000) % 60];
+	var time = ``
+
+	if (unconvertedTime [0] < 10) {
+		time += `0`;
+	}
+
+	time += `${unconvertedTime [0]}:`;
+
+	if (unconvertedTime [1] < 10) {
+		time += `0`;
+	}
+
+	time += `${unconvertedTime [1]}`;
+	return time;
+}
+
+function addSong (message, song) {
 	queue.push (song);
 	message.channel.send (`Even though this is your job, I added **${song.title}** to the queue for you, shitty admiral!`);
-	
+
 	if (queue.length == 1) {
 		try {
 			play (message, queue [index]);
@@ -223,34 +280,14 @@ async function execute (query, message) {
 	}
 }
 
-function timestamp (ms) {
-	const unconvertedTime = new Date (ms);
-	var time = ``
-
-	if (unconvertedTime.getMinutes () < 10) {
-		time += `0`;
-	}
-
-	time += `${unconvertedTime.getMinutes ()}:`;
-
-	if (unconvertedTime.getSeconds () < 10) {
-		time += `0`;
-	}
-
-	time += `${unconvertedTime.getSeconds ()}`;
-	return time;
-}
-
 function info (query, message) {
-	if (! message.member.voice.channel) {
-		message.channel.send ("I can't tell you about music without being in a voice channel, you stupid admiral!");
-	} else if (! queue) {
+	if (queue.length < 1) {
 		message.channel.send ("There isn't any music to describe, you shitty admiral!");
 	} else {
 		var newIndex = parseInt (query, 10);
 
 		if (! query) {
-			message.channel.send (`You are at ${timestamp (connection.dispatcher.streamTime)} out of a total of ${queue [index].length} in the song ${queue [index].title}, which can be found at https://www.youtube.com/watch?v=${queue [index].id}, you shitty admiral!`);
+			message.channel.send (`You're at ${timestamp (connection.dispatcher.streamTime)} out of a total of ${queue [index].length} in the song ${queue [index].title}, which can be found at https://www.youtube.com/watch?v=${queue [index].id}, you shitty admiral!`);
 		} else if (isNaN (newIndex)) {
 			message.channel.send (`**${query}** isn't a valid index, you stupid admiral!`);
 		} else if (newIndex < 1 || newIndex > queue.length) {
@@ -263,7 +300,7 @@ function info (query, message) {
 }
 
 function move (query, message) {
-	if (! message.member.voice.channel) {
+	if (! connection) {
 		message.channel.send ("I can't move music without being in a voice channel, you stupid admiral!");
 	} else if (queue.length < 2) {
 		message.channel.send ("There isn't enough music to move, you shitty admiral!");
@@ -299,7 +336,7 @@ function move (query, message) {
 }
 
 function swap (query, message) {
-	if (! message.member.voice.channel) {
+	if (! connection) {
 		message.channel.send ("I can't swap music without being in a voice channel, you stupid admiral!");
 	} else if (queue.length < 2) {
 		message.channel.send ("There isn't enough music to swap, you shitty admiral!");
@@ -331,9 +368,9 @@ function swap (query, message) {
 }
 
 function skip (query, message) {
-	if (! message.member.voice.channel) {
+	if (! connection) {
 		message.channel.send ("I can't skip music without being in a voice channel, you stupid admiral!");
-	} else if (! queue) {
+	} else if (queue.length < 1) {
 		message.channel.send ("There isn't any music to skip, you shitty admiral!");
 	} else {
 		var newIndex = parseInt (query, 10);
@@ -346,7 +383,7 @@ function skip (query, message) {
 				stop (message);
 				return;
 			}
-			
+
 			try {
 				play (message, queue [index]);
 			} catch (error) {
@@ -373,9 +410,9 @@ function skip (query, message) {
 }
 
 function remove (query, message) {
-	if (! message.member.voice.channel) {
+	if (! connection) {
 		message.channel.send ("I can't remove music without being in a voice channel, you stupid admiral!");
-	} else if (! queue) {
+	} else if (queue.length < 1) {
 		message.channel.send ("There isn't any music to remove, you shitty admiral!");
 	} else {
 		var newIndex = parseInt (query, 10);
@@ -388,11 +425,20 @@ function remove (query, message) {
 			newIndex --;
 
 			const song = queue [newIndex];
-			
+
 			queue.splice (newIndex, 1);
 			message.channel.send (`I've removed **${song.title}** for you, you shitty admiral!`);
 
-			if (newIndex === index) {
+			if (newIndex <= index) {
+				if (newIndex < index) {
+					index --;
+				}
+
+				if (queue.length < 1) {
+					stop (message);
+					return;
+				}
+
 				try {
 					play (message, queue [index]);
 				} catch (error) {
@@ -408,13 +454,15 @@ function stop (message) {
 	queue = [];
 	index = 0;
 
-	if (! message.member.voice.channel) {
-		message.channel.send ("I can't stop music without being in a voice channel, you stupid admiral!");
-	} else if (! connection.dispatcher) {
-		message.channel.send ("I can't stop music if I'm not fully connected, you stupid admiral!");
-	} else {
+	if (! connection) {
+		message.channel.send ("I can't stop music without being in a voice channel, you stupid admiral!")
+	}
+
+	connection.disconnect ();
+
+	if (connection.dispatcher) {
 		connection.dispatcher.end ();
-		message.channel.send ("I've stopped playing your horrible music, you shitty admiral!")
+		message.channel.send ("I've stopped playing your horrible music, you shitty admiral!");
 	}
 }
 
@@ -425,7 +473,7 @@ function play (message, song) {
 		return;
 	}
 
-	const dispatcher = connection.play (/* ytdl (`https://www.youtube.com/watch?v=${song.id}`) */`${song.url}`).on ("finish", () => {
+	const dispatcher = connection.play (`${song.url}`).on ("finish", () => {
 		index ++;
 
 		switch (loopState) {
@@ -445,6 +493,48 @@ function play (message, song) {
 
 	dispatcher.setVolumeLogarithmic (1);
 	message.channel.send (`I'm currently playing **${song.title}** for you! You better be grateful, you shitty admiral!`);
+}
+
+function listQueue (message, songs, search) {
+	var i, list;
+
+	if (search) {
+		list = `These are my search results, you shitty admiral!\n`
+	} else {
+		list = `This is the current queue, you shitty admiral! `;
+
+		switch (loopState) {
+			case 0:
+				list += `I'm not looping anything right now, you shitty admiral!\n`;
+				break;
+			case 1:
+				list += `I'm looping the queue right now, you shitty admiral!\n`;
+				break;
+			case 2:
+				list += `I'm looping the current song right now, you shitty admiral!\n`;
+				break;
+		}
+	}
+
+	if (songs.length === 0) {
+		if (search) {
+			message.channel.send ("I didn't find anything in my search, you shitty admiral!");
+		} else {
+			message.channel.send ("The queue is empty, you stupid admiral!");
+		}
+
+		return;
+	}
+
+	for (i = 0; i < songs.length; i ++) {
+		if (! search && i === index) {
+			list += `[Current] `;
+		}
+
+		list += `${i + 1} - ${songs [i].title} (${songs [i].length})\n`;
+	}
+
+	message.channel.send (list);
 }
 
 function loop (message) {
