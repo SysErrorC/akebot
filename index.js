@@ -57,7 +57,7 @@ client.on ("message", message => {
 			} else if (arguments [0] === "play") {
 				message.channel.send (`Your music is annoying! Why would anybody let you use **${query} youtube_query** to play music, huh!? You shitty admiral!`);
 			} else if (arguments [0] === "search") {
-				message.channel.send (`Wow, now you can pick and choose what you want to annoy me with using **${query} youtube_query** and then typing a song number afterwards. You shitty admiral!\nThis command currently doesn't work as intended and will only give 2 search results instead of 10`);
+				message.channel.send (`You can pick and choose a song out of ten by using **${query} youtube_query** and then typing the song number afterwards. Now you can be extra specific with your torture, you shitty admiral!`);
 			} else if (arguments [0] === "info") {
 				message.channel.send (`Are you so inept that you need to use **${query} [song_index]** to find information about the current song or a song at a given index? You stupid admiral!`);
 			} else if (arguments [0] === "move") {
@@ -113,7 +113,7 @@ client.on ("message", message => {
 		skip (arguments [0], message);
 	} else if (command === "remove") {
 		remove (arguments [0], message);
-	} else if (command === "stop") {
+	} else if (command === "stop" || command === "leave") {
 		stop (message);
 	} else if (command === "queue") {
 		listQueue (message, queue, false);
@@ -195,9 +195,9 @@ async function execute (query, message, search) {
 	}
 
 	message.channel.send (`I'm currently searching for **${query}**, you shitty admiral!`);
-	const info = await ytdlInfo.getInfo (query, ["--default-search=ytsearch10", "-i", "--format=best"]);
 
 	if (search) {
+		const info = await ytdlInfo.getInfo (`ytsearch10:${query}`, ['--default-search=ytsearch', '-i', '--format=best'], true);
 		const songs = [];
 		var i;
 
@@ -238,6 +238,7 @@ async function execute (query, message, search) {
 			message.channel.send ("I've stopped listening for a song choice, you shitty admiral!");
 		});
 	} else {
+		const info = await ytdlInfo.getInfo (`${query}`);
 		const song = {
 			title: info.items [0].title,
 			url: info.items [0].url,
@@ -455,10 +456,11 @@ function stop (message) {
 	index = 0;
 
 	if (! connection) {
-		message.channel.send ("I can't stop music without being in a voice channel, you stupid admiral!")
+		message.channel.send ("I can't stop music without being in a voice channel, you stupid admiral!");
 	}
 
 	connection.disconnect ();
+	message.channel.send ("I've cleared the queue and left the voice channel, you shitty admiral!");
 
 	if (connection.dispatcher) {
 		connection.dispatcher.end ();
