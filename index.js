@@ -128,42 +128,37 @@ client.on ("message", message => {
 	}
 });
 
-function aniball() {
-	const responses = [
-		"M-maybe. Baka!",
+function aniball (message) {
+	const responses = [ "M-maybe. Baka!",
 		"Nyope!",
 		"Yup. Trust me - I'm the STRONGEST!",
 		"ERRR... uhm... Why do YOU want to know?!?",
 		".......",
 		"Yeah, if you think so!",
 		"NIGERUNDAYO SMOKEY!!",
-		"Se~no!",
-	];
-	
-	const randomIndex = Math.floor(Math.random() * responses.length);
-	
-	//sends animegirl associated with line
+		"Se~no!" ];
+	const randomIndex = Math.floor (Math.random () * responses.length);
+
 	if(randomIndex === 0)
-	bot.reply("https://safebooru.donmai.us/data/sample/__misaka_mikoto_to_aru_majutsu_no_index_and_1_more_drawn_by_ranf__sample-4dc545929c3e836487450f0cc9fbe541.jpg");
+		bot.reply("https://safebooru.donmai.us/data/sample/__misaka_mikoto_to_aru_majutsu_no_index_and_1_more_drawn_by_ranf__sample-4dc545929c3e836487450f0cc9fbe541.jpg");
 	if randomIndex === 1)
-	bot.reply("https://media1.tenor.com/images/117ac22a4b54cbf139310c9d77dcaadd/tenor.gif?itemid=17810041");
+		bot.reply("https://media1.tenor.com/images/117ac22a4b54cbf139310c9d77dcaadd/tenor.gif?itemid=17810041");
 	else if(randomIndex === 2)
-	bot.reply("https://i3.kym-cdn.com/entries/icons/facebook/000/018/206/bT561.jpg");
+		bot.reply("https://i3.kym-cdn.com/entries/icons/facebook/000/018/206/bT561.jpg");
 	else if(randomIndex === 3)
-	bot.reply("http://img3.wikia.nocookie.net/__cb20131224061720/tora-dora/images/8/88/29_taiga_blush_again.jpg");
+		bot.reply("http://img3.wikia.nocookie.net/__cb20131224061720/tora-dora/images/8/88/29_taiga_blush_again.jpg");
 	else if(randomIndex === 4)
-	bot.reply("https://d235zo2kjgm9jl.cloudfront.net/original/2X/7/736c82596ebf6821a75946dcdaf99f560765dd4a.png");
+		bot.reply("https://d235zo2kjgm9jl.cloudfront.net/original/2X/7/736c82596ebf6821a75946dcdaf99f560765dd4a.png");
 	else if(randomIndex === 5)
-	bot.reply("https://safebooru.donmai.us/data/sample/__rem_re_zero_kara_hajimeru_isekai_seikatsu_drawn_by_sekina__sample-de3f6f4dfbb8cc0feb79c1a40e704ed6.jpg");
+		bot.reply("https://safebooru.donmai.us/data/sample/__rem_re_zero_kara_hajimeru_isekai_seikatsu_drawn_by_sekina__sample-de3f6f4dfbb8cc0feb79c1a40e704ed6.jpg");
 	else if(randomIndex === 6)
-	bot.reply("https://66.media.tumblr.com/7f61c596ce36186c9fb670bebaa3fb65/tumblr_inline_ozxgtf5YUZ1up66o7_500.jpg");
+		bot.reply("https://66.media.tumblr.com/7f61c596ce36186c9fb670bebaa3fb65/tumblr_inline_ozxgtf5YUZ1up66o7_500.jpg");
 	else if(randomIndex === 7)
-	bot.reply("https://i.ytimg.com/vi/pW_BuE42Nk8/maxresdefault.jpg");
-	
-	//sends reply
+		bot.reply("https://i.ytimg.com/vi/pW_BuE42Nk8/maxresdefault.jpg");
 	bot.reply(message, responses[randomIndex]);
 	
 }
+
 function waifu (query, message) {
 	if (! query.length) {
 		message.channel.send ("I need a waifu to find, you shitty admiral!");
