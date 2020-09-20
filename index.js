@@ -44,7 +44,7 @@ client.on ("message", message => {
 
 	if (command === "help") {
 		if (! arguments.length) {
-			message.channel.send (`Special-type destroyer number 18, 8th of the Ayanami-class, Akebono. My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use **${prefix}help command_name** to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}waifu\n${prefix}list\n${prefix}8ball\n${prefix}play\n${prefix}search\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!\nIf you want to contact my shitty admiral to offer suggestions, report bugs, or offer waifu pictures, join my support server at https://discord.gg/hFQQEcZ, you equally shitty admiral! If you want to examine me, you can go to my GitHub at https://github.com/zuiun/akebot, you perverted admiral!`);
+			message.channel.send (`Special-type destroyer number 18, 8th of the Ayanami-class, Akebono. My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use **${prefix}help command_name** to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}waifu\n${prefix}list\n${prefix}8ball or ${prefix}aniball\n${prefix}play\n${prefix}search\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop or ${prefix}leave\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!\nIf you want to contact my shitty admiral to offer suggestions, report bugs, or offer waifu pictures, join my support server at https://discord.gg/hFQQEcZ, you equally shitty admiral! If you want to examine me, you can go to my GitHub at https://github.com/zuiun/akebot, you perverted admiral!`);
 		} else {
 			var query = `${prefix}${arguments [0]}`
 
@@ -54,8 +54,8 @@ client.on ("message", message => {
 				message.channel.send (`Why are you so interested in other girls, huh? If you're so needy, you can use **${query} name** to get a picture of your waifu, you perverted admiral! If you don't care who you get, you can use **${query} random**, you shitty admiral!`);
 			} else if (arguments [0] === "list") {
 				message.channel.send (`How disgusting! Are you keeping a track of your waifus using **${query}**!? You perverted admiral!`);
-			} else if (arguments [0] === "8ball") {
-				message.channel.send (``);
+			} else if (arguments [0] === "8ball" || arguments [0] === "aniball") {
+				message.channel.send (`You really need your waifus to make your decisions for you using **${query}**? What a shitty admiral!`);
 			} else if (arguments [0] === "play") {
 				message.channel.send (`Your music is annoying! Why would anybody let you use **${query} youtube_query** to play music, huh!? You shitty admiral!`);
 			} else if (arguments [0] === "search") {
@@ -70,7 +70,7 @@ client.on ("message", message => {
 				message.channel.send (`Since you apparently didn't already know, you can use **${query} [song_index]** to skip to the next song or to a different song on the queue, you stupid admiral!`);
 			} else if (arguments [0] === "remove") {
 				message.channel.send (`If you'd like to spare my ears from your torture, you can use **${query} song_index** to remove a specific song from the queue, but you'd never do that, you shitty admiral!`);
-			} else if (arguments [0] === "stop") {
+			} else if (arguments [0] === "stop" || arguments [0] === "leave") {
 				message.channel.send (`Is this a blessing? You're finally going to use **${query}** to clear the queue and stop the torturous music? You must be tricking me, you shitty admiral!`);
 			} else if (arguments [0] === "queue") {
 				message.channel.send (`Are you so brainless that you can't remember what's on the queue without using **${query}**? What a stupid admiral!`);
