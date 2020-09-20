@@ -10,6 +10,7 @@
     "ffmpeg": "0.0.4",
     "ffmpeg-static": "^4.2.7",
     "fluent-ffmpeg": "^2.1.2",
+    "moment": "^2.28.0",
     "node-fetch": "^2.6.1",
     "ytdl-core": "^3.2.2",
     "ytdl-getinfo": "^1.1.0"
