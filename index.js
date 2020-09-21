@@ -1,9 +1,10 @@
-const { prefix, token } = require ("./config.json");
+const { token } = require ("./config.json");
 const database = require ("./database.json");
 const aliases = require ("./aliases.json");
 const extras = require ("./extras.json");
 const ytdlInfo = require ("ytdl-getinfo");
 const Discord = require ("discord.js");
+const fs = require ("fs");
 const client = new Discord.Client ();
 
 const waitTime = 10000;
@@ -15,14 +16,14 @@ var index = 0;
 var loopState = 0;
 
 client.once ("ready", () => {
-	client.user.setActivity (`Use ${prefix}help if you need me, you shitty admiral!`);
+	client.user.setActivity (`Use !help if you need me, you shitty admiral!`);
 
 	for (var i in database) {
 		for (var j in database [i]) {
 			random.push (database [i] [j]);
 		}
 	}
-	
+
 	console.log ("Ready!");
 });
 
@@ -35,6 +36,14 @@ client.once ("disconnect", () => {
 });
 
 client.on ("message", message => {
+	var prefixes = JSON.parse (fs.readFileSync ("./prefixes.json", "utf-8"));
+
+	if (! prefixes [message.guild.id]) {
+		setPrefix (prefixes ["default"], message);
+	}
+
+	var prefix = prefixes [message.guild.id];
+
 	if (! message.content.startsWith (prefix) || message.author.bot) {
 		return;
 	}
@@ -44,12 +53,14 @@ client.on ("message", message => {
 
 	if (command === "help") {
 		if (! arguments.length) {
-			message.channel.send (`Special-type destroyer number 18, 8th of the Ayanami-class, Akebono. My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use **${prefix}help command_name** to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}waifu\n${prefix}list\n${prefix}8ball or ${prefix}aniball\n${prefix}play\n${prefix}search\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop or ${prefix}leave\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!\nIf you want to contact my shitty admiral to offer suggestions, report bugs, or offer waifu pictures, join my support server at https://discord.gg/hFQQEcZ, you equally shitty admiral! If you want to examine me, you can go to my GitHub at https://github.com/zuiun/akebot, you perverted admiral!`);
+			message.channel.send (`Special-type destroyer number 18, 8th of the Ayanami-class, Akebono. My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use **${prefix}help command_name** to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}help\n${prefix}prefix\n${prefix}waifu\n${prefix}list\n${prefix}8ball or ${prefix}aniball\n${prefix}play\n${prefix}search\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop or ${prefix}leave\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!\nIf you want to contact my shitty admiral to offer suggestions, report bugs, or offer waifu pictures, join my support server at https://discord.gg/hFQQEcZ, you equally shitty admiral! If you want to examine me, you can go to my GitHub at https://github.com/zuiun/akebot, you perverted admiral!`);
 		} else {
 			var query = `${prefix}${arguments [0]}`
 
 			if (arguments [0] === "help") {
 				message.channel.send (`Huh? Are you an idiot? **${query}** just tells you my commands! **Bolded phrases** are commands, while [bracketed arguments] are optional, you stupid admiral!`);
+			} else if (arguments [0] === "prefix") {
+				message.channel.send (`You can't even use a prefix properly!? Ugh, then you'll have to set one with **${query} new_prefix**, you shitty admiral!`);
 			} else if (arguments [0] === "waifu") {
 				message.channel.send (`Why are you so interested in other girls, huh? If you're so needy, you can use **${query} name** to get a picture of your waifu, you perverted admiral! If you don't care who you get, you can use **${query} random**, you shitty admiral!`);
 			} else if (arguments [0] === "list") {
@@ -80,16 +91,12 @@ client.on ("message", message => {
 				message.channel.send (`Are you trying to trick me? **${query}** isn't one of my commands, you shitty admiral!`);
 			}
 		}
+	} else if (command === "prefix") {
+		setPrefix (arguments [0], message);
 	} else if (command === "waifu") {
 		waifu (arguments, message);
 	} else if (command === "list") {
-		var list = `Here are all of my supported waifus, you perverted admiral! They're in the format **alias (database_name)**!\nAlso I'm far too lazy to properly format these - Ike\n`;
-
-		for (var key in aliases) {
-			list += `${key} (${aliases [key]})\n`;
-		}
-
-		message.channel.send (list);
+		message.channel.send ("You can find all available waifus here, you perverted admiral!\nhttps://raw.githubusercontent.com/zuiun/akebot/master/aliases.json");
 	} else if (command === "8ball" || command === "aniball") {
 		const response = Math.floor (Math.random () * extras ["8ball"].length);
 		message.channel.send (extras ["8ball"] [response] [0]);
@@ -127,12 +134,35 @@ client.on ("message", message => {
 		loop (message);
 	} else if (command === "rickroll") {
 		message.channel.send ("https://i.imgur.com/yed5Zfk.gif");
-	} else if (command === "baka") {
+	} else if (command === "insult" || command === "baka") {
 		message.channel.send (extras ["insults"] [Math.floor (Math.random () * extras ["insults"].length)].replace ("${NAME}", `<@${message.author.id}>`));
+	} else if (command === "laugh" || command === "wonky") {
+		message.channel.send ("I eat shitty admirals like you for breakfast!");
+		message.channel.send ("https://cdn.discordapp.com/attachments/757245390167736434/757436349543350364/Laughing-scout-SFM.gif");
 	} else {
 		message.channel.send (`**${prefix}${command}** isn't one of my commands, you stupid admiral!`);
 	}
 });
+
+function setPrefix (query, message) {
+	var prefixes = JSON.parse (fs.readFileSync ("./prefixes.json", "utf-8"))
+
+	if (! message.member.hasPermission ("MANAGE_GUILD")) {
+		message.channel.send ("You don't have a high enough rank to order me around, you shitty recruit!");
+	} else if (! query) {
+		message.channel.send ("You need to actually give me a prefix, you stupid admiral!");
+	} else {
+		var originalPrefix = prefixes [message.guild.id];
+
+		prefixes [message.guild.id] = query;
+		fs.writeFile ("./prefixes.json", JSON.stringify (prefixes), (error) => {
+			if (error) {
+				console.log (error);
+			}
+		});
+		message.channel.send (`I've changed this server's prefix from ${originalPrefix} to ${prefixes [message.guild.id]}, you shitty admiral!`);
+	}
+}
 
 function waifu (query, message) {
 	if (! query.length) {
