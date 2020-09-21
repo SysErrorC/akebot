@@ -8,8 +8,8 @@ const { Console } = require("console");
 const client = new Discord.Client ();
 
 const waitTime = 10000;
-var connection;
-var queue = [];
+var connection = {};
+var queue = {};
 var random = [];
 var counter = 0;
 var index = 0;
@@ -46,6 +46,10 @@ client.on ("message", message => {
 
 	if (! message.content.startsWith (prefix) || message.author.bot) {
 		return;
+	}
+
+	if (! queue [message.guild.id]) {
+		queue [message.guild.id] = [];
 	}
 
 	const arguments = message.content.slice (prefix.length).trim ().split(/ +/);
@@ -133,7 +137,7 @@ client.on ("message", message => {
 	} else if (command === "stop" || command === "leave") {
 		stop (message);
 	} else if (command === "queue") {
-		listQueue (message, queue, false);
+		listQueue (message, queue [message.guild.id], false);
 	} else if (command === "loop") {
 		loop (message);
 	} else if (command === "rickroll") {
@@ -221,7 +225,7 @@ function aliasName (query) {
 
 function marry (query, message) {
 	if (! query.length) {
-		message.channel.send ("I need marriage actions to do, you shitty admiral!");
+		message.channel.send ("You need to use a marriage action, you stupid admiral!");
 		return;
 	}
 
@@ -247,10 +251,10 @@ function marry (query, message) {
 						const index = marriages [person].indexOf (search);
 
 						marriages [person].splice (index, 1);
-						message.channel.send (`You've divorced ${search}, you shitty admiral!`);
+						message.channel.send (`You've divorced **${search}**, you shitty admiral!`);
 					} else {
 						marriages [person].push (search);
-						message.channel.send (`You've married ${search}, you perverted admiral!`);
+						message.channel.send (`You've married **${search}**, you perverted admiral!`);
 					}
 
 					fs.writeFile ("./marriages.json", JSON.stringify (marriages), (error) => {
@@ -290,10 +294,10 @@ function marry (query, message) {
 				}
 			}
 
-			message.channel.send (`You're not married to ${search}, you stupid admiral!`);
+			message.channel.send (`You're not married to **${search}**, you stupid admiral!`);
 			break;
 		default:
-			message.channel.send (`${query [0]} isn't a valid action, you stupid admiral!`);
+			message.channel.send (`**${query [0]}** isn't a valid action, you stupid admiral!`);
 			return;
 	}
 
@@ -319,15 +323,15 @@ function getMarriage (person) {
 	if (marriages [person]) {
 		if (marriages [person].length > 0) {
 			let girls = ``;
-	
+
 			for (var i in marriages [person]) {
 				girls += `[${marriages [person] [i]}], `;
 			}
-	
+
 			return girls.substring (0, girls.length - 2);
 		}
 	}
-	
+
 	return "nobody";
 }
 
@@ -379,7 +383,7 @@ async function execute (query, message, search) {
 		return;
 	}
 
-	connection = await voiceChannel.join ();
+	connection [message.guild.id] = await voiceChannel.join ();
 
 	if (! query) {
 		message.channel.send ("You didn't give me a song, you stupid admiral!");
@@ -460,12 +464,12 @@ function timestamp (ms) {
 }
 
 function addSong (message, song) {
-	queue.push (song);
+	queue [message.guild.id].push (song);
 	message.channel.send (`Even though this is your job, I added **${song.title}** to the queue for you, you shitty admiral!`);
 
-	if (queue.length == 1) {
+	if (queue [message.guild.id].length == 1) {
 		try {
-			play (message, queue [index]);
+			play (message, queue [message.guild.id] [index]);
 		} catch (error) {
 			console.log (error);
 			return;
@@ -474,28 +478,28 @@ function addSong (message, song) {
 }
 
 function info (query, message) {
-	if (queue.length < 1) {
+	if (queue [message.guild.id].length < 1) {
 		message.channel.send ("There isn't any music to describe, you shitty admiral!");
 	} else {
 		var newIndex = parseInt (query, 10);
 
 		if (! query) {
-			message.channel.send (`You're at ${timestamp (connection.dispatcher.streamTime)} out of a total of ${queue [index].length} in the song ${queue [index].title}, which can be found at https://www.youtube.com/watch?v=${queue [index].id}, you shitty admiral!`);
+			message.channel.send (`You're at ${timestamp (connection [message.guild.id].dispatcher.streamTime)} out of a total of ${queue [message.guild.id] [index].length} in the song ${queue [message.guild.id] [index].title}, which can be found at https://www.youtube.com/watch?v=${queue [message.guild.id] [index].id}, you shitty admiral!`);
 		} else if (isNaN (newIndex)) {
 			message.channel.send (`**${query}** isn't a valid index, you stupid admiral!`);
-		} else if (newIndex < 1 || newIndex > queue.length) {
+		} else if (newIndex < 1 || newIndex > queue [message.guild.id].length) {
 			message.channel.send (`**${query}** isn't inside the queue, you stupid admiral!`);
 		} else {
 			newIndex --;
-			message.channel.send (`The song at index ${newIndex + 1} is ${queue [newIndex].title} and ${queue [newIndex].length} long, which can be found at https://www.youtube.com/watch?v=${queue [newIndex].id}, you shitty admiral!`);
+			message.channel.send (`The song at index ${newIndex + 1} is ${queue [message.guild.id] [newIndex].title} and ${queue [message.guild.id] [newIndex].length} long, which can be found at https://www.youtube.com/watch?v=${queue [message.guild.id] [newIndex].id}, you shitty admiral!`);
 		}
 	}
 }
 
 function move (query, message) {
-	if (! connection) {
+	if (! connection [message.guild.id]) {
 		message.channel.send ("I can't move music without being in a voice channel, you stupid admiral!");
-	} else if (queue.length < 2) {
+	} else if (queue [message.guild.id].length < 2) {
 		message.channel.send ("There isn't enough music to move, you shitty admiral!");
 	} else if (query.length < 2) {
 		message.channel.send ("You didn't give me enough indices to move music, you shitty admiral!");
@@ -504,21 +508,21 @@ function move (query, message) {
 
 		if (isNaN (first) || isNaN (second)) {
 			message.channel.send (`**${first}** and/or **${second}** aren't valid indices, you stupid admiral!`);
-		} else if (first < 1 || first > queue.length || second < 1 || second > queue.length) {
+		} else if (first < 1 || first > queue [message.guild.id].length || second < 1 || second > queue [message.guild.id].length) {
 			message.channel.send (`**${first}** and/or **${second}** aren't inside the queue, you stupid admiral!`);
 		} else {
 			first --;
 			second --;
 			
-			const song = queue [first];
+			const song = queue [message.guild.id] [first];
 
-    		queue.splice (first, 1);
-			queue.splice (second, 0, song);
+    		queue [message.guild.id].splice (first, 1);
+			queue [message.guild.id].splice (second, 0, song);
 			message.channel.send (`I've moved ${song.title} from index ${first + 1} to index ${second + 1}, you shitty admiral!`);
 
 			if (first === index || second === index) {
 				try {
-					play (message, queue [index]);
+					play (message, queue [message.guild.id] [index]);
 				} catch (error) {
 					console.log (error);
 					return;
@@ -529,9 +533,9 @@ function move (query, message) {
 }
 
 function swap (query, message) {
-	if (! connection) {
+	if (! connection [message.guild.id]) {
 		message.channel.send ("I can't swap music without being in a voice channel, you stupid admiral!");
-	} else if (queue.length < 2) {
+	} else if (queue [message.guild.id].length < 2) {
 		message.channel.send ("There isn't enough music to swap, you shitty admiral!");
 	} else if (query.length < 2) {
 		message.channel.send ("You didn't give me enough indices to swap music, you shitty admiral!");
@@ -540,17 +544,17 @@ function swap (query, message) {
 
 		if (isNaN (first) || isNaN (second)) {
 			message.channel.send (`**${first}** and/or **${second}** aren't valid indices, you stupid admiral!`);
-		} else if (first < 1 || first > queue.length || second < 1 || second > queue.length) {
+		} else if (first < 1 || first > queue [message.guild.id].length || second < 1 || second > queue [message.guild.id].length) {
 			message.channel.send (`**${first}** and/or **${second}** aren't inside the queue, you stupid admiral!`);
 		} else {
 			first --;
 			second --;
-			[queue [first], queue [second]] = [queue [second], queue [first]]
-			message.channel.send (`I've swapped ${queue [second].title} at index ${first + 1} with ${queue [first].title} at index ${second + 1}, you shitty admiral!`);
+			[queue [message.guild.id] [first], queue [message.guild.id] [second]] = [queue [message.guild.id] [second], queue [message.guild.id] [first]]
+			message.channel.send (`I've swapped ${queue [message.guild.id] [second].title} at index ${first + 1} with ${queue [message.guild.id] [first].title} at index ${second + 1}, you shitty admiral!`);
 
 			if (first === index || second === index) {
 				try {
-					play (message, queue [index]);
+					play (message, queue [message.guild.id] [index]);
 				} catch (error) {
 					console.log (error);
 					return;
@@ -561,9 +565,9 @@ function swap (query, message) {
 }
 
 function skip (query, message) {
-	if (! connection) {
+	if (! connection [message.guild.id]) {
 		message.channel.send ("I can't skip music without being in a voice channel, you stupid admiral!");
-	} else if (queue.length < 1) {
+	} else if (queue [message.guild.id].length < 1) {
 		message.channel.send ("There isn't any music to skip, you shitty admiral!");
 	} else {
 		var newIndex = parseInt (query, 10);
@@ -571,29 +575,29 @@ function skip (query, message) {
 		if (! query) {
 			index ++;
 
-			if (index >= queue.length) {
+			if (index >= queue [message.guild.id].length) {
 				message.channel.send (`You skipped to the end of the queue, you stupid admiral!`);
 				stop (message);
 				return;
 			}
 
 			try {
-				play (message, queue [index]);
+				play (message, queue [message.guild.id] [index]);
 			} catch (error) {
 				console.log (error);
 				return;
 			}
 		} else if (isNaN (newIndex)) {
 			message.channel.send (`**${query}** isn't a valid index, you stupid admiral!`);
-		} else if (newIndex < 1 || newIndex > queue.length) {
+		} else if (newIndex < 1 || newIndex > queue [message.guild.id].length) {
 			message.channel.send (`**${query}** isn't inside the queue, you stupid admiral!`);
 		} else {
 			index = newIndex;
 			index --;
-			message.channel.send (`I've skipped to index ${index + 1}, which is ${queue [index].title}, you shitty admiral!`);
+			message.channel.send (`I've skipped to index ${index + 1}, which is ${queue [message.guild.id] [index].title}, you shitty admiral!`);
 
 			try {
-				play (message, queue [index]);
+				play (message, queue [message.guild.id] [index]);
 			} catch (error) {
 				console.log (error);
 				return;
@@ -603,23 +607,23 @@ function skip (query, message) {
 }
 
 function remove (query, message) {
-	if (! connection) {
+	if (! connection [message.guild.id]) {
 		message.channel.send ("I can't remove music without being in a voice channel, you stupid admiral!");
-	} else if (queue.length < 1) {
+	} else if (queue [message.guild.id].length < 1) {
 		message.channel.send ("There isn't any music to remove, you shitty admiral!");
 	} else {
 		var newIndex = parseInt (query, 10);
 
 		if (! query || isNaN (newIndex)) {
 			message.channel.send (`**${query}** isn't a valid index, you stupid admiral!`);
-		} else if (newIndex < 1 || newIndex > queue.length) {
+		} else if (newIndex < 1 || newIndex > queue [message.guild.id].length) {
 			message.channel.send (`**${query}** isn't inside the queue, you stupid admiral!`);
 		} else {
 			newIndex --;
 
-			const song = queue [newIndex];
+			const song = queue [message.guild.id] [newIndex];
 
-			queue.splice (newIndex, 1);
+			queue [message.guild.id].splice (newIndex, 1);
 			message.channel.send (`I've removed **${song.title}** for you, you shitty admiral!`);
 
 			if (newIndex <= index) {
@@ -627,13 +631,13 @@ function remove (query, message) {
 					index --;
 				}
 
-				if (queue.length < 1) {
+				if (queue [message.guild.id].length < 1) {
 					stop (message);
 					return;
 				}
 
 				try {
-					play (message, queue [index]);
+					play (message, queue [message.guild.id] [index]);
 				} catch (error) {
 					console.log (error);
 					return;
@@ -644,17 +648,17 @@ function remove (query, message) {
 }
 
 function stop (message) {
-	queue = [];
+	queue [message.guild.id] = [];
 	index = 0;
 
-	if (! connection) {
+	if (! connection [message.guild.id]) {
 		message.channel.send ("I can't stop music without being in a voice channel, you stupid admiral!");
 	} else {
-		connection.disconnect ();
+		connection [message.guild.id].channel.leave ();
 		message.channel.send ("I've cleared the queue and left the voice channel, you shitty admiral!");
 
-		if (connection.dispatcher) {
-			connection.dispatcher.end ();
+		if (connection [message.guild.id].dispatcher) {
+			connection [message.guild.id].dispatcher.end ();
 			message.channel.send ("I've stopped playing your horrible music, you shitty admiral!");
 		}
 	}
@@ -667,12 +671,12 @@ function play (message, song) {
 		return;
 	}
 
-	const dispatcher = connection.play (`${song.url}`).on ("finish", () => {
+	const dispatcher = connection [message.guild.id].play (`${song.url}`).on ("finish", () => {
 		index ++;
 
 		switch (loopState) {
 			case 1:
-				if (index === queue.length) {
+				if (index === queue [message.guild.id].length) {
 					index = 0;
 				}
 
@@ -682,7 +686,7 @@ function play (message, song) {
 				break;
 		}
 
-		play (message, queue [index]);
+		play (message, queue [message.guild.id] [index]);
 	}).on ("error", error => console.error (error));
 
 	dispatcher.setVolumeLogarithmic (1);
