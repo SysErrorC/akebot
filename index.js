@@ -1,6 +1,5 @@
 const { token } = require ("./config.json");
 const database = require ("./database.json");
-const aliases = require ("./aliases.json");
 const extras = require ("./extras.json");
 const ytdlInfo = require ("ytdl-getinfo");
 const Discord = require ("discord.js");
@@ -19,8 +18,8 @@ client.once ("ready", () => {
 	client.user.setActivity (`Use !help if you need me, you shitty admiral!`);
 
 	for (var i in database) {
-		for (var j in database [i]) {
-			random.push (database [i] [j]);
+		for (var j in database [i] [1]) {
+			random.push (database [i] [1] [j]);
 		}
 	}
 
@@ -64,7 +63,7 @@ client.on ("message", message => {
 			} else if (arguments [0] === "waifu") {
 				message.channel.send (`Why are you so interested in other girls, huh? If you're so needy, you can use **${query} name** to get a picture of your waifu, you perverted admiral! If you don't care who you get, you can use **${query} random**, you shitty admiral!`);
 			} else if (arguments [0] === "list") {
-				message.channel.send (`How disgusting! Are you keeping a track of your waifus using **${query}**!? You perverted admiral!`);
+				message.channel.send (`How disgusting! Are you keeping a track of your waifus using **${query}**!? You perverted admiral!\nThis command sends a huge amount of text, so please don't overuse it, you shitty admiral!`);
 			} else if (arguments [0] === "8ball" || arguments [0] === "aniball") {
 				message.channel.send (`You really need your waifus to make your decisions for you using **${query}**? What a shitty admiral!`);
 			} else if (arguments [0] === "play") {
@@ -96,7 +95,7 @@ client.on ("message", message => {
 	} else if (command === "waifu") {
 		waifu (arguments, message);
 	} else if (command === "list") {
-		message.channel.send ("You can find all available waifus here, you perverted admiral!\nhttps://raw.githubusercontent.com/zuiun/akebot/master/aliases.json");
+		list (message);
 	} else if (command === "8ball" || command === "aniball") {
 		const response = Math.floor (Math.random () * extras ["8ball"].length);
 		message.channel.send (extras ["8ball"] [response] [0]);
@@ -175,15 +174,17 @@ function waifu (query, message) {
 		return;
 	}
 
-	var query = `${query.join (" ")}`;
+	let search = `${query.join (" ")}`;
 
-	for (var i in aliases) {
-		if (i === query) {
-			query = aliases [i];
+	for (var i in database) {
+		for (var j in database [i] [0]) {
+			if (database [i] [0] [j] === search) {
+				search = i;
+			}
 		}
 	}
 
-	if (query === "akebono") {
+	if (search === "akebono") {
 		if (counter < 1) {
 			message.channel.send ("W-why should I send you pictures of myself, you perverted admiral!?");
 			counter ++;
@@ -197,15 +198,31 @@ function waifu (query, message) {
 	}
 
 	for (var i in database) {
-		if (i === query) {
-			const images = database [i];
+		if (i === search) {
+			const images = database [i] [1];
 
 			message.channel.send (images [Math.floor (Math.random () * images.length)]);
 			return;
 		}
 	}
 
-	message.channel.send (`**${query}** isn't one of the waifus in my database, you shitty admiral!`);
+	message.channel.send (`**${search}** isn't one of the waifus in my database, you shitty admiral!`);
+}
+
+function list (message) {
+	for (var i in database) {
+		let aliases = `${i} - `;
+
+		if (i === "random") {
+			break;
+		}
+
+		for (var j in database [i] [0]) {
+			aliases += `[${database [i] [0] [j]}], `;
+		}
+
+		message.channel.send (aliases.substring (0, aliases.length - 2));
+	}
 }
 
 async function execute (query, message, search) {

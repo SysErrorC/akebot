@@ -1,2 +1,6 @@
 node_modules/
 config.json
+marriages.json
+package.json
+package-lock.json
+prefixes.json
