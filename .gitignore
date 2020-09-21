@@ -1,4 +1,5 @@
 node_modules/
+bot.bat
 config.json
 marriages.json
 package.json
