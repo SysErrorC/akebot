@@ -4,6 +4,7 @@ const extras = require ("./extras.json");
 const ytdlInfo = require ("ytdl-getinfo");
 const Discord = require ("discord.js");
 const fs = require ("fs");
+const { Console } = require("console");
 const client = new Discord.Client ();
 
 const waitTime = 10000;
@@ -52,40 +53,42 @@ client.on ("message", message => {
 
 	if (command === "help") {
 		if (! arguments.length) {
-			message.channel.send (`Special-type destroyer number 18, 8th of the Ayanami-class, Akebono. My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use **${prefix}help command_name** to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}help\n${prefix}prefix\n${prefix}waifu\n${prefix}list\n${prefix}8ball or ${prefix}aniball\n${prefix}play\n${prefix}search\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop or ${prefix}leave\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!\nIf you want to contact my shitty admiral to offer suggestions, report bugs, or offer waifu pictures, join my support server at https://discord.gg/hFQQEcZ, you equally shitty admiral! If you want to examine me, you can go to my GitHub at https://github.com/zuiun/akebot, you perverted admiral!`);
+			message.channel.send (`Special-type destroyer number 18, 8th of the Ayanami-class, Akebono. My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use **${prefix}help command_name** to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}help\n${prefix}prefix\n${prefix}waifu\n${prefix}marry\n${prefix}list\n${prefix}8ball or ${prefix}aniball\n${prefix}play\n${prefix}search\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop or ${prefix}leave\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!\nIf you want to contact my shitty admiral to offer suggestions, report bugs, or offer waifu pictures, join my support server at https://discord.gg/hFQQEcZ, you equally shitty admiral! If you want to examine me, you can go to my GitHub at https://github.com/zuiun/akebot, you perverted admiral!`);
 		} else {
 			var query = `${prefix}${arguments [0]}`
 
 			if (arguments [0] === "help") {
-				message.channel.send (`Huh? Are you an idiot? **${query}** just tells you my commands! **Bolded phrases** are commands, while [bracketed arguments] are optional, you stupid admiral!`);
+				message.channel.send (`Huh? Are you an idiot? **${query}** just tells you my commands! **Bolded phrases** are commands, <angular-bracketed arguments> are user-defined arguments>, while [square-bracketed arguments] are optional arguments, you stupid admiral!`);
 			} else if (arguments [0] === "prefix") {
-				message.channel.send (`You can't even use a prefix properly!? Ugh, then you'll have to set one with **${query} new_prefix**, you shitty admiral!`);
+				message.channel.send (`You can't even use a prefix properly!? Ugh, then you'll have to set one with **${query} <prefix>**, you shitty admiral!`);
 			} else if (arguments [0] === "waifu") {
-				message.channel.send (`Why are you so interested in other girls, huh? If you're so needy, you can use **${query} name** to get a picture of your waifu, you perverted admiral! If you don't care who you get, you can use **${query} random**, you shitty admiral!`);
+				message.channel.send (`Why are you so interested in other girls, huh? If you're so needy, you can use **${query} <name>** to get a picture of your waifu, you perverted admiral! If you don't care who you get, you can use **${query} random**, you shitty admiral!`);
+			} else if (arguments [0] === "marry") {
+				message.channel.send (`Are you sure that the marriages you're making or ending with **${query} marry <name>** aren't forced marriages, you shitty admiral? You can see either your or someone else's (forced) marriage partners with **${query} view [mention_someone]** and interact with your (forced) marriage partners with **${query} fun <name>**, you perverted admiral!`);
 			} else if (arguments [0] === "list") {
 				message.channel.send (`How disgusting! Are you keeping a track of your waifus using **${query}**!? You perverted admiral!\nThis command sends a huge amount of text, so please don't overuse it, you shitty admiral!`);
 			} else if (arguments [0] === "8ball" || arguments [0] === "aniball") {
 				message.channel.send (`You really need your waifus to make your decisions for you using **${query}**? What a shitty admiral!`);
 			} else if (arguments [0] === "play") {
-				message.channel.send (`Your music is annoying! Why would anybody let you use **${query} youtube_query** to play music, huh!? You shitty admiral!`);
+				message.channel.send (`Your music is annoying! Why would anybody let you use **${query} <query>** to play music, huh!? You shitty admiral!`);
 			} else if (arguments [0] === "search") {
-				message.channel.send (`You can pick and choose a song out of ten by using **${query} youtube_query** and then typing the song number afterwards. Now you can be extra specific with your torture, you shitty admiral!`);
+				message.channel.send (`You can pick and choose a song out of ten by using **${query} <query>** and then typing the song number afterwards. Now you can be extra specific with your torture, you shitty admiral!`);
 			} else if (arguments [0] === "info") {
 				message.channel.send (`Are you so inept that you need to use **${query} [song_index]** to find information about the current song or a song at a given index? You stupid admiral!`);
 			} else if (arguments [0] === "move") {
-				message.channel.send (`Since you're so indecisive, you can use **${query} song_index destination_index** to change a song's position on the queue, you shitty admiral!`);
+				message.channel.send (`Since you're so indecisive, you can use **${query} <song_index> <destination_index>** to change a song's position (will shift other songs' positions) on the queue, you shitty admiral!`);
 			} else if (arguments [0] === "swap") {
-				message.channel.send (`Since you somehow mistook two completely different songs, you can use **${query} song_one_index song_two_index** to swap two songs' position on the queue, you shitty admiral!`);
+				message.channel.send (`Since you somehow mistook two completely different songs, you can use **${query} <song_one_index> <song_two_index>** to swap two songs' position on the queue, you shitty admiral!`);
 			} else if (arguments [0] === "skip") {
 				message.channel.send (`Since you apparently didn't already know, you can use **${query} [song_index]** to skip to the next song or to a different song on the queue, you stupid admiral!`);
 			} else if (arguments [0] === "remove") {
-				message.channel.send (`If you'd like to spare my ears from your torture, you can use **${query} song_index** to remove a specific song from the queue, but you'd never do that, you shitty admiral!`);
+				message.channel.send (`If you'd like to spare my ears from your torture, you can use **${query} <song_index>** to remove a specific song from the queue, but you'd never do that, you shitty admiral!`);
 			} else if (arguments [0] === "stop" || arguments [0] === "leave") {
 				message.channel.send (`Is this a blessing? You're finally going to use **${query}** to clear the queue and stop the torturous music? You must be tricking me, you shitty admiral!`);
 			} else if (arguments [0] === "queue") {
 				message.channel.send (`Are you so brainless that you can't remember what's on the queue without using **${query}**? What a stupid admiral!`);
 			} else if (arguments [0] === "loop") {
-				message.channel.send (`Using **${query}** will allow you to toggle between loop states, not that I expect you to know what that means! You stupid admiral!`);
+				message.channel.send (`Using **${query}** will allow you to toggle between loop states, not that I expect you to know what that means, you stupid admiral!`);
 			} else {
 				message.channel.send (`Are you trying to trick me? **${query}** isn't one of my commands, you shitty admiral!`);
 			}
@@ -94,6 +97,8 @@ client.on ("message", message => {
 		setPrefix (arguments [0], message);
 	} else if (command === "waifu") {
 		waifu (arguments, message);
+	} else if (command === "marry") {
+		marry (arguments, message);
 	} else if (command === "list") {
 		list (message);
 	} else if (command === "8ball" || command === "aniball") {
@@ -144,7 +149,7 @@ client.on ("message", message => {
 });
 
 function setPrefix (query, message) {
-	var prefixes = JSON.parse (fs.readFileSync ("./prefixes.json", "utf-8"))
+	var prefixes = JSON.parse (fs.readFileSync ("./prefixes.json", "utf-8"));
 
 	if (! message.member.hasPermission ("MANAGE_GUILD")) {
 		message.channel.send ("You don't have a high enough rank to order me around, you shitty recruit!");
@@ -175,14 +180,7 @@ function waifu (query, message) {
 	}
 
 	let search = `${query.join (" ")}`;
-
-	for (var i in database) {
-		for (var j in database [i] [0]) {
-			if (database [i] [0] [j] === search) {
-				search = i;
-			}
-		}
-	}
+	search = aliasName (search);
 
 	if (search === "akebono") {
 		if (counter < 1) {
@@ -207,6 +205,147 @@ function waifu (query, message) {
 	}
 
 	message.channel.send (`**${search}** isn't one of the waifus in my database, you shitty admiral!`);
+}
+
+function aliasName (query) {
+	for (var i in database) {
+		for (var j in database [i] [0]) {
+			if (database [i] [0] [j] === query) {
+				return i;
+			}
+		}
+	}
+
+	return query;
+}
+
+function marry (query, message) {
+	if (! query.length) {
+		message.channel.send ("I need marriage actions to do, you shitty admiral!");
+		return;
+	}
+
+	var person = message.author.id;
+	let search = `${query.slice (1).join (" ")}`;
+
+	createMarriage (person);
+
+	switch (query [0]) {
+		case "marry":
+			if (! search) {
+				message.channel.send ("You need to ask for a waifu, you shitty admiral!");
+				return;
+			}
+
+			search = aliasName (search);
+
+			for (var i in database) {
+				if (i === search) {
+					let marriages = JSON.parse (fs.readFileSync ("./marriages.json", "utf-8"));
+
+					if (marriages [person].includes (search)) {
+						const index = marriages [person].indexOf (search);
+
+						marriages [person].splice (index, 1);
+						message.channel.send (`You've divorced ${search}, you shitty admiral!`);
+					} else {
+						marriages [person].push (search);
+						message.channel.send (`You've married ${search}, you perverted admiral!`);
+					}
+
+					fs.writeFile ("./marriages.json", JSON.stringify (marriages), (error) => {
+						if (error) {
+							console.log (error);
+						}
+					});
+					return;
+				}
+			}
+
+			break;
+		case "view":
+			let araragi = getMention (search);
+
+			if (araragi) {
+				message.channel.send (`${araragi} is married to ${getMarriage (araragi)}, you shitty admiral!`);
+			} else {
+				message.channel.send (`<@${person}> is married to ${getMarriage (person)}, you shitty admiral!`);
+			}
+
+			return;
+		case "fun":
+			if (! search) {
+				message.channel.send ("You need to ask for a marriage partner, you shitty admiral!");
+				return;
+			}
+
+			search = aliasName (search);
+
+			for (var i in database) {
+				if (i === search) {
+					const lines = database [i] [2];
+
+					message.channel.send (lines [Math.floor (Math.random () * lines.length)]);
+					return;
+				}
+			}
+
+			message.channel.send (`You're not married to ${search}, you stupid admiral!`);
+			break;
+		default:
+			message.channel.send (`${query [0]} isn't a valid action, you stupid admiral!`);
+			return;
+	}
+
+	message.channel.send (`**${search}** isn't one of the waifus in my database, you shitty admiral!`);
+}
+
+function createMarriage (person) {
+	var marriages = JSON.parse (fs.readFileSync ("./marriages.json", "utf-8"));
+
+	if (! marriages [person]) {
+		marriages [person] = [];
+		fs.writeFile ("./marriages.json", JSON.stringify (marriages), (error) => {
+			if (error) {
+				console.log (error);
+			}
+		});
+	}
+}
+
+function getMarriage (person) {
+	var marriages = JSON.parse (fs.readFileSync ("./marriages.json", "utf-8"));
+
+	if (marriages [person]) {
+		if (marriages [person].length > 0) {
+			let girls = ``;
+	
+			for (var i in marriages [person]) {
+				girls += `[${marriages [person] [i]}], `;
+			}
+	
+			return girls.substring (0, girls.length - 2);
+		}
+	}
+	
+	return "nobody";
+}
+
+function getMention (query) {
+	console.log(query);
+	if (! query) {
+		return;
+	}
+
+	if (query.startsWith ("<@") && query.endsWith (">")) {
+		let result = query.slice (2, -1);
+
+		if (result.startsWith ("!")) {
+			result = result.slice (1);
+		}
+
+		return client.users.cache.get (result);
+	}
 }
 
 function list (message) {
@@ -322,7 +461,7 @@ function timestamp (ms) {
 
 function addSong (message, song) {
 	queue.push (song);
-	message.channel.send (`Even though this is your job, I added **${song.title}** to the queue for you, shitty admiral!`);
+	message.channel.send (`Even though this is your job, I added **${song.title}** to the queue for you, you shitty admiral!`);
 
 	if (queue.length == 1) {
 		try {
@@ -510,14 +649,14 @@ function stop (message) {
 
 	if (! connection) {
 		message.channel.send ("I can't stop music without being in a voice channel, you stupid admiral!");
-	}
+	} else {
+		connection.disconnect ();
+		message.channel.send ("I've cleared the queue and left the voice channel, you shitty admiral!");
 
-	connection.disconnect ();
-	message.channel.send ("I've cleared the queue and left the voice channel, you shitty admiral!");
-
-	if (connection.dispatcher) {
-		connection.dispatcher.end ();
-		message.channel.send ("I've stopped playing your horrible music, you shitty admiral!");
+		if (connection.dispatcher) {
+			connection.dispatcher.end ();
+			message.channel.send ("I've stopped playing your horrible music, you shitty admiral!");
+		}
 	}
 }
 
