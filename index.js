@@ -50,7 +50,7 @@ client.on ("message", message => {
 		if (! arguments.length) {
 			message.channel.send (`Special-type destroyer number 18, 8th of the Ayanami-class, Akebono. My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use **${prefix}help command_name** to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}help\n${prefix}prefix\n${prefix}waifu\n${prefix}marry\n${prefix}list\n${prefix}8ball or ${prefix}aniball\n${prefix}play\n${prefix}search\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop or ${prefix}leave\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!\nIf you want to contact my shitty admiral to offer suggestions, report bugs, or offer waifu pictures, join my support server at https://discord.gg/hFQQEcZ, you equally shitty admiral! If you want to examine me, you can go to my GitHub at https://github.com/zuiun/akebot, you perverted admiral!`);
 		} else {
-			var query = `${prefix}${arguments [0]}`
+			var query = prefix + arguments [0];
 
 			if (arguments [0] === "help") {
 				message.channel.send (`Huh? Are you an idiot? **${query}** just tells you my commands! **Bolded phrases** are commands, <angular-bracketed arguments> are user-defined arguments>, while [square-bracketed arguments] are optional arguments, you stupid admiral!`);
@@ -99,6 +99,7 @@ client.on ("message", message => {
 		// list (message);
 	} else if (command === "8ball" || command === "aniball") {
 		const response = Math.floor (Math.random () * extras ["8ball"].length);
+
 		message.channel.send (extras ["8ball"] [response] [0]);
 		message.channel.send (extras ["8ball"] [response] [1]);
 	} else if (command === "headpat") {
@@ -111,10 +112,10 @@ client.on ("message", message => {
 		message.channel.send ("This is Shikinami, a fellow special-type destroyer and a colleague of mine. If you touch her, I'll kill you, you perverted admiral!");
 		message.channel.send ("https://cdn.donmai.us/original/43/c0/__shikinami_kantai_collection_drawn_by_onio__43c00ac5e146da1b20b54fa32791b3d9.gif");
 	} else if (command === "play") {
-		const query = `${arguments.join (" ")}`;
+		const query = arguments.join (" ");
 		execute (query, message, false);
 	} else if (command === "search") {
-		const query = `${arguments.join (" ")}`;
+		const query = arguments.join (" ");
 		execute (query, message, true);
 	} else if (command === "info") {
 		info (arguments [0], message);
@@ -160,7 +161,7 @@ function setPrefix (query, message) {
 				console.log (error);
 			}
 		});
-		message.channel.send (`I've changed this server's prefix from ${originalPrefix} to ${prefixes [message.guild.id]}, you shitty admiral!`);
+		message.channel.send (`I've changed this server's prefix from **${originalPrefix}** to **${prefixes [message.guild.id]}**, you shitty admiral!`);
 	}
 }
 
@@ -178,16 +179,19 @@ function waifu (query, message) {
 		for (var i in database) {
 			if (i === "random") {
 				for (var j in database [i]) {
-					random.push (database [i] [j]);
+					random.push ([i, database [i] [j]]);
 				}
 			} else {
 				for (var j in database [i] [1]) {
-					random.push (database [i] [1] [j]);
+					random.push ([i, database [i] [1] [j]]);
 				}
 			}
 		}
 
-		message.channel.send (random [Math.floor (Math.random () * random.length)]);
+		let index = Math.floor (Math.random () * random.length);
+
+		message.channel.send (`This is a picture of **${random [index] [0]}**, you perverted admiral!`);
+		message.channel.send (random [index] [1]);
 		return;
 	}
 
@@ -301,9 +305,10 @@ function marry (query, message) {
 
 			for (var i in database) {
 				if (i === search) {
-					const lines = database [i] [2];
+					let data = database [i];
 
-					message.channel.send (lines [Math.floor (Math.random () * lines.length)]);
+					message.channel.send (data [1] [Math.floor (Math.random () * data [1].length)]);
+					message.channel.send (data [2] [Math.floor (Math.random () * data [2].length)]);
 					return;
 				}
 			}
@@ -336,17 +341,27 @@ function getMarriage (person) {
 
 	if (marriages [person]) {
 		if (marriages [person].length > 0) {
-			let girls = ``;
+			let girls = "";
 
 			for (var i in marriages [person]) {
-				girls += `[${marriages [person] [i]}], `;
+				let add = `**${marriages [person] [i]}**`;
+
+				if (i <= marriages [person].length - 2) {
+					add += ", ";
+
+					if (i == marriages [person].length - 2) {
+						add += "and ";
+					}
+				}
+
+				girls += add;
 			}
 
-			return girls.substring (0, girls.length - 2);
+			return girls;
 		}
 	}
 
-	return "nobody";
+	return "**nobody**";
 }
 
 function getMention (query) {
@@ -369,17 +384,29 @@ function list (message) {
 	var database = JSON.parse (fs.readFileSync ("./database.json", "utf-8"));
 
 	for (var i in database) {
-		let aliases = `${i} - `;
+		let aliases = `**${i}** - **`;
 
 		if (i === "random") {
 			break;
 		}
 
 		for (var j in database [i] [0]) {
-			aliases += `[${database [i] [0] [j]}], `;
+			let add = database [i] [0] [j];
+
+			if (i <= database [i] [0].length - 2) {
+				add += ", ";
+
+				if (i == database [i] [0].length - 2) {
+					add += "and ";
+				}
+			} else if (i == database [i] [0].length - 1) {
+				add += "**";
+			}
+
+			aliases += add;
 		}
 
-		message.channel.send (aliases.substring (0, aliases.length - 2));
+		message.channel.send (aliases);
 	}
 }
 
@@ -451,7 +478,7 @@ async function execute (query, message, search) {
 			message.channel.send ("I've stopped listening for a song choice, you shitty admiral!");
 		});
 	} else {
-		const info = await ytdlInfo.getInfo (`${query}`);
+		const info = await ytdlInfo.getInfo (query);
 		const song = {
 			title: info.items [0].title,
 			url: info.items [0].url,
@@ -465,7 +492,7 @@ async function execute (query, message, search) {
 
 function timestamp (ms) {
 	const unconvertedTime = [ Math.floor (ms / 1000 / 60), Math.floor (ms / 1000) % 60];
-	var time = ``
+	var time = `**`
 
 	if (unconvertedTime [0] < 10) {
 		time += `0`;
@@ -477,7 +504,7 @@ function timestamp (ms) {
 		time += `0`;
 	}
 
-	time += `${unconvertedTime [1]}`;
+	time += `${unconvertedTime [1]}**`;
 	return time;
 }
 
@@ -502,14 +529,14 @@ function info (query, message) {
 		var newIndex = parseInt (query, 10);
 
 		if (! query) {
-			message.channel.send (`You're at ${timestamp (connection [message.guild.id].dispatcher.streamTime)} out of a total of ${queue [message.guild.id] [index].length} in the song ${queue [message.guild.id] [index].title}, which can be found at https://www.youtube.com/watch?v=${queue [message.guild.id] [index].id}, you shitty admiral!`);
+			message.channel.send (`You're at **${timestamp (connection [message.guild.id].dispatcher.streamTime)}** out of a total of **${queue [message.guild.id] [index].length}** in the song **${queue [message.guild.id] [index].title}**, which can be found at https://www.youtube.com/watch?v=${queue [message.guild.id] [index].id}, you shitty admiral!`);
 		} else if (isNaN (newIndex)) {
 			message.channel.send (`**${query}** isn't a valid index, you stupid admiral!`);
 		} else if (newIndex < 1 || newIndex > queue [message.guild.id].length) {
 			message.channel.send (`**${query}** isn't inside the queue, you stupid admiral!`);
 		} else {
 			newIndex --;
-			message.channel.send (`The song at index ${newIndex + 1} is ${queue [message.guild.id] [newIndex].title} and ${queue [message.guild.id] [newIndex].length} long, which can be found at https://www.youtube.com/watch?v=${queue [message.guild.id] [newIndex].id}, you shitty admiral!`);
+			message.channel.send (`The song at index **${newIndex + 1}** is **${queue [message.guild.id] [newIndex].title}** and **${queue [message.guild.id] [newIndex].length}** long, which can be found at https://www.youtube.com/watch?v=${queue [message.guild.id] [newIndex].id}, you shitty admiral!`);
 		}
 	}
 }
@@ -536,7 +563,7 @@ function move (query, message) {
 
     		queue [message.guild.id].splice (first, 1);
 			queue [message.guild.id].splice (second, 0, song);
-			message.channel.send (`I've moved ${song.title} from index ${first + 1} to index ${second + 1}, you shitty admiral!`);
+			message.channel.send (`I've moved **${song.title}** from index **${first + 1}** to index **${second + 1}**, you shitty admiral!`);
 
 			if (first === index || second === index) {
 				try {
@@ -568,7 +595,7 @@ function swap (query, message) {
 			first --;
 			second --;
 			[queue [message.guild.id] [first], queue [message.guild.id] [second]] = [queue [message.guild.id] [second], queue [message.guild.id] [first]]
-			message.channel.send (`I've swapped ${queue [message.guild.id] [second].title} at index ${first + 1} with ${queue [message.guild.id] [first].title} at index ${second + 1}, you shitty admiral!`);
+			message.channel.send (`I've swapped **${queue [message.guild.id] [second].title}** at index **${first + 1}** with **${queue [message.guild.id] [first].title}** at index **${second + 1}**, you shitty admiral!`);
 
 			if (first === index || second === index) {
 				try {
@@ -612,7 +639,7 @@ function skip (query, message) {
 		} else {
 			index = newIndex;
 			index --;
-			message.channel.send (`I've skipped to index ${index + 1}, which is ${queue [message.guild.id] [index].title}, you shitty admiral!`);
+			message.channel.send (`I've skipped to index **${index + 1}**, which is **${queue [message.guild.id] [index].title}**, you shitty admiral!`);
 
 			try {
 				play (message, queue [message.guild.id] [index]);
@@ -689,7 +716,7 @@ function play (message, song) {
 		return;
 	}
 
-	const dispatcher = connection [message.guild.id].play (`${song.url}`).on ("finish", () => {
+	const dispatcher = connection [message.guild.id].play (song.url).on ("finish", () => {
 		index ++;
 
 		switch (loopState) {
@@ -747,7 +774,7 @@ function listQueue (message, songs, search) {
 			list += `[Current] `;
 		}
 
-		list += `${i + 1} - ${songs [i].title} (${songs [i].length})\n`;
+		list += `**${i + 1}** - **${songs [i].title}** (**${songs [i].length}**)\n`;
 	}
 
 	message.channel.send (list);
