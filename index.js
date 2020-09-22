@@ -1,5 +1,4 @@
 const { token } = require ("./config.json");
-const database = require ("./database.json");
 const extras = require ("./extras.json");
 const ytdlInfo = require ("ytdl-getinfo");
 const Discord = require ("discord.js");
@@ -10,20 +9,12 @@ const client = new Discord.Client ();
 const waitTime = 10000;
 var connection = {};
 var queue = {};
-var random = [];
 var counter = 0;
 var index = 0;
 var loopState = 0;
 
 client.once ("ready", () => {
 	client.user.setActivity (`Use !help if you need me, you shitty admiral!`);
-
-	for (var i in database) {
-		for (var j in database [i] [1]) {
-			random.push (database [i] [1] [j]);
-		}
-	}
-
 	console.log ("Ready!");
 });
 
@@ -104,7 +95,8 @@ client.on ("message", message => {
 	} else if (command === "marry") {
 		marry (arguments, message);
 	} else if (command === "list") {
-		list (message);
+		message.channel.send ("You can find all available waifus at https://raw.githubusercontent.com/zuiun/akebot/master/database.json, you perverted admiral!");
+		// list (message);
 	} else if (command === "8ball" || command === "aniball") {
 		const response = Math.floor (Math.random () * extras ["8ball"].length);
 		message.channel.send (extras ["8ball"] [response] [0]);
@@ -178,12 +170,28 @@ function waifu (query, message) {
 		return;
 	}
 
+	var database = JSON.parse (fs.readFileSync ("./database.json", "utf-8"));
+
 	if (query [0] === "random") {
+		let random = [];
+
+		for (var i in database) {
+			if (i === "random") {
+				for (var j in database [i]) {
+					random.push (database [i] [j]);
+				}
+			} else {
+				for (var j in database [i] [1]) {
+					random.push (database [i] [1] [j]);
+				}
+			}
+		}
+
 		message.channel.send (random [Math.floor (Math.random () * random.length)]);
 		return;
 	}
 
-	let search = `${query.join (" ")}`;
+	let search = query.join (" ").toLowerCase ();
 	search = aliasName (search);
 
 	if (search === "akebono") {
@@ -212,6 +220,8 @@ function waifu (query, message) {
 }
 
 function aliasName (query) {
+	var database = JSON.parse (fs.readFileSync ("./database.json", "utf-8"));
+
 	for (var i in database) {
 		for (var j in database [i] [0]) {
 			if (database [i] [0] [j] === query) {
@@ -230,16 +240,18 @@ function marry (query, message) {
 	}
 
 	var person = message.author.id;
-	let search = `${query.slice (1).join (" ")}`;
+	let search = query.slice (1).join (" ").toLowerCase ();
 
 	createMarriage (person);
 
-	switch (query [0]) {
+	switch (query [0].toLowerCase ()) {
 		case "marry":
 			if (! search) {
 				message.channel.send ("You need to ask for a waifu, you shitty admiral!");
 				return;
 			}
+
+			var database = JSON.parse (fs.readFileSync ("./database.json", "utf-8"));
 
 			search = aliasName (search);
 
@@ -271,7 +283,7 @@ function marry (query, message) {
 			let araragi = getMention (search);
 
 			if (araragi) {
-				message.channel.send (`${araragi} is married to ${getMarriage (araragi)}, you shitty admiral!`);
+				message.channel.send (`<@${araragi}> is married to ${getMarriage (araragi)}, you shitty admiral!`);
 			} else {
 				message.channel.send (`<@${person}> is married to ${getMarriage (person)}, you shitty admiral!`);
 			}
@@ -282,6 +294,8 @@ function marry (query, message) {
 				message.channel.send ("You need to ask for a marriage partner, you shitty admiral!");
 				return;
 			}
+
+			var database = JSON.parse (fs.readFileSync ("./database.json", "utf-8"));
 
 			search = aliasName (search);
 
@@ -336,7 +350,6 @@ function getMarriage (person) {
 }
 
 function getMention (query) {
-	console.log(query);
 	if (! query) {
 		return;
 	}
@@ -348,11 +361,13 @@ function getMention (query) {
 			result = result.slice (1);
 		}
 
-		return client.users.cache.get (result);
+		return result;
 	}
 }
 
 function list (message) {
+	var database = JSON.parse (fs.readFileSync ("./database.json", "utf-8"));
+
 	for (var i in database) {
 		let aliases = `${i} - `;
 
@@ -420,12 +435,14 @@ async function execute (query, message, search) {
 				response.channel.send (`**${response}** isn't inside the queue, you stupid admiral!`);
 			} else {
 				index --;
+
 				const song = {
 					title: songs [index].title,
 					url: songs [index].url,
 					id: songs [index].id,
 					length: songs [index].length
 				};
+
 				addSong (message, song);
 				collector.stop ();
 			}
@@ -441,6 +458,7 @@ async function execute (query, message, search) {
 			id: info.items [0].id,
 			length: timestamp (parseInt (info.items [0].duration) * 1000)
 		};
+
 		addSong (message, song);
 	}
 }
