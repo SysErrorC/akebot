@@ -252,7 +252,7 @@ function marry (query, message) {
 	switch (query [0].toLowerCase ()) {
 		case "marry":
 			if (! search) {
-				message.channel.send ("You need to ask for a waifu, you shitty admiral!");
+				message.channel.send ("Even though you're a sad, lonely, virgin, you can't marry the air, you shitty admiral!");
 				return;
 			}
 
@@ -268,10 +268,10 @@ function marry (query, message) {
 						const index = marriages [person].indexOf (search);
 
 						marriages [person].splice (index, 1);
-						message.channel.send (`You've divorced **${search}**, you shitty admiral!`);
+						message.channel.send (`You've divorced **${search}**, you shitty admiral! Not that your marriage would've worked out anyway!`);
 					} else {
 						marriages [person].push (search);
-						message.channel.send (`You've married **${search}**, you perverted admiral!`);
+						message.channel.send (`You've married **${search}**, you perverted admiral! Why do I have to do the rites!?`);
 					}
 
 					fs.writeFile ("./marriages.json", JSON.stringify (marriages), (error) => {
@@ -288,15 +288,15 @@ function marry (query, message) {
 			let araragi = getMention (search);
 
 			if (araragi) {
-				message.channel.send (`<@${araragi}> is married to ${getMarriage (araragi)}, you shitty admiral!`);
+				message.channel.send (`<@${araragi}> is married to ${getMarriage (araragi)}, you shitty admiral! Don't pry into other peoples' lives!`);
 			} else {
-				message.channel.send (`<@${person}> is married to ${getMarriage (person)}, you shitty admiral!`);
+				message.channel.send (`You're married to ${getMarriage (person)}, you stupid admiral! How did you manage to forget that!?`);
 			}
 
 			return;
 		case "fun":
 			if (! search) {
-				message.channel.send ("You need to ask for a marriage partner, you shitty admiral!");
+				message.channel.send ("You need to ask for a marriage partner, you perverted admiral!");
 				return;
 			}
 
@@ -308,8 +308,8 @@ function marry (query, message) {
 				if (i === search) {
 					let data = database [i];
 
-					message.channel.send (data [1] [Math.floor (Math.random () * data [1].length)]);
 					message.channel.send (data [2] [Math.floor (Math.random () * data [2].length)]);
+					message.channel.send (data [1] [Math.floor (Math.random () * data [1].length)]);
 					return;
 				}
 			}
