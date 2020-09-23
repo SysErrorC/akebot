@@ -252,7 +252,7 @@ function marry (query, message) {
 	switch (query [0].toLowerCase ()) {
 		case "marry":
 			if (! search) {
-				message.channel.send ("Even though you're a sad, lonely, virgin, you can't marry the air, you shitty admiral!");
+				message.channel.send ("Even though you're a pathetic existence, I'm not going to marry you to the air out of pity, you shitty admiral!");
 				return;
 			}
 
