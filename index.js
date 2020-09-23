@@ -7,6 +7,7 @@ const { Console } = require("console");
 const client = new Discord.Client ();
 
 const waitTime = 10000;
+var searching = false;
 var connection = {};
 var queue = {};
 var counter = 0;
@@ -48,7 +49,7 @@ client.on ("message", message => {
 
 	if (command === "help") {
 		if (! arguments.length) {
-			message.channel.send (`Special-type destroyer number 18, 8th of the Ayanami-class, Akebono. My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use **${prefix}help command_name** to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}help\n${prefix}prefix\n${prefix}waifu\n${prefix}marry\n${prefix}list\n${prefix}8ball or ${prefix}aniball\n${prefix}play\n${prefix}search\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop or ${prefix}leave\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!\nIf you want to contact my shitty admiral to offer suggestions, report bugs, or offer waifu pictures, join my support server at https://discord.gg/hFQQEcZ, you equally shitty admiral! If you want to examine me, you can go to my GitHub at https://github.com/zuiun/akebot, you perverted admiral!`);
+			message.channel.send (`Special-type destroyer number 18, 8th of the Ayanami-class, Akebono. My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use **${prefix}help command_name** to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}help\n${prefix}prefix\n${prefix}waifu\n${prefix}marry\n${prefix}list\n${prefix}8ball or ${prefix}aniball\n${prefix}play\n${prefix}search\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop or ${prefix}leave or ${prefix}clear\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!\nIf you want to contact my shitty admiral to offer suggestions, report bugs, or offer waifu pictures, join my support server at https://discord.gg/hFQQEcZ, you equally shitty admiral! If you want to examine me, you can go to my GitHub at https://github.com/zuiun/akebot, you perverted admiral!`);
 		} else {
 			var query = prefix + arguments [0];
 
@@ -78,7 +79,7 @@ client.on ("message", message => {
 				message.channel.send (`Since you apparently didn't already know, you can use **${query} [song_index]** to skip to the next song or to a different song on the queue, you stupid admiral!`);
 			} else if (arguments [0] === "remove") {
 				message.channel.send (`If you'd like to spare my ears from your torture, you can use **${query} <song_index>** to remove a specific song from the queue, but you'd never do that, you shitty admiral!`);
-			} else if (arguments [0] === "stop" || arguments [0] === "leave") {
+			} else if (arguments [0] === "stop" || arguments [0] === "leave" || arguments [0] === "clear") {
 				message.channel.send (`Is this a blessing? You're finally going to use **${query}** to clear the queue and stop the torturous music? You must be tricking me, you shitty admiral!`);
 			} else if (arguments [0] === "queue") {
 				message.channel.send (`Are you so brainless that you can't remember what's on the queue without using **${query}**? What a stupid admiral!`);
@@ -127,7 +128,7 @@ client.on ("message", message => {
 		skip (arguments [0], message);
 	} else if (command === "remove") {
 		remove (arguments [0], message);
-	} else if (command === "stop" || command === "leave") {
+	} else if (command === "stop" || command === "leave" || command === "clear") {
 		stop (message);
 	} else if (command === "queue") {
 		listQueue (message, queue [message.guild.id], false);
@@ -432,9 +433,15 @@ async function execute (query, message, search) {
 		return;
 	}
 
-	message.channel.send (`I'm currently searching for **${query}**, you shitty admiral!`);
-
 	if (search) {
+		if (searching) {
+			message.channel.send ("I'm already searching for music, you shitty admiral! Wait your turn!");
+			return;
+		} else {
+			message.channel.send (`I'm currently searching for **${query}**, you shitty admiral!`);
+			searching = true;
+		}
+
 		const info = await ytdlInfo.getInfo (`ytsearch10:${query}`, ['--default-search=ytsearch', '-i', '--format=best'], true);
 		const songs = [];
 		var i;
@@ -476,8 +483,11 @@ async function execute (query, message, search) {
 		})
 		collector.on ("end", collected => {
 			message.channel.send ("I've stopped listening for a song choice, you shitty admiral!");
+			searching = false;
 		});
 	} else {
+		message.channel.send (`I'm currently searching for **${query}**, you shitty admiral!`);
+
 		const info = await ytdlInfo.getInfo (query);
 		const song = {
 			title: info.items [0].title,
