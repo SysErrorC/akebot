@@ -7,6 +7,7 @@ const { Console } = require("console");
 const client = new Discord.Client ();
 
 const waitTime = 10000;
+const talkedRecently = new Set();
 var searching = false;
 var connection = {};
 var queue = {};
@@ -321,7 +322,10 @@ function marry (query, message) {
 
 					message.channel.send (data [2] [Math.floor (Math.random () * data [2].length)]);
 					message.channel.send (data [1] [Math.floor (Math.random () * data [1].length)]);
-					addEXP (i, person, 2);
+					if(!talkedRecently.has(msg.author.id))
+						addEXP (i, person, 2);
+					talkedRecently.add(msg.author.id);
+					setTimeout(() => {talkedRecently.delete(msg.author.id);}, 60000);
 					return;
 				}
 			}
@@ -398,8 +402,16 @@ function getLevel (query, person) {
 	let married = isMarried (query, person);
 
 	if (married > -1) {
-		// TODO: Create marriage levels
-		return marriages [person] [married] [1];
+		if(marriages [person] [married] [1])< 10)
+		return "simp";
+		if(marriages [person] [married] [1])< 20)
+		return "fan";
+		if(marriages [person] [married] [1])< 40)
+		return "lover";
+		if(marriages [person] [married] [1])< 80)
+		return "connoisseur";
+		if(marriages [person] [married] [1])< 160)
+		return "cultist";
 	}
 
 	return -1;
