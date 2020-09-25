@@ -355,16 +355,16 @@ function getMarriage (person) {
 	if (marriages [person]) {
 		let marriage = marriages [person];
 
-		if (marriage [0].length > 0) {
+		if (marriage.length > 0) {
 			let girls = "";
 
-			for (var i in marriage [0]) {
-				let add = `**${marriage [0] [i]}** (**${getLevel (marriage [0] [i], person)}**)`;
+			for (var i in marriage) {
+				let add = `**${marriage [i] [0]}** (**${getLevel (marriage [i] [0], person)}**)`;
 
-				if (i <= marriage [0].length - 2) {
+				if (i <= marriage.length - 2) {
 					add += ", ";
 
-					if (i == marriage [0].length - 2) {
+					if (i == marriage.length - 2) {
 						add += "and ";
 					}
 				}
@@ -383,7 +383,11 @@ function isMarried (query, person) {
 	var marriages = JSON.parse (fs.readFileSync ("./marriages.json", "utf-8"));
 
 	if (marriages [person]) {
-		return marriages [person] [0].indexOf (query);
+		for (var i = 0; i < marriages [person].length; i ++) {
+			if (marriages [person] [i] [0] === query) {
+				return i;
+			}
+		}
 	}
 
 	return -1;
@@ -394,8 +398,8 @@ function getLevel (query, person) {
 	let married = isMarried (query, person);
 
 	if (married > -1) {
-		// TODO: Calculate marriage level
-		return marriages [person] [1] [married];
+		// TODO: Create marriage levels
+		return marriages [person] [married] [1];
 	}
 
 	return -1;
@@ -406,7 +410,7 @@ function addEXP (query, person, amount) {
 	let married = isMarried (query, person);
 
 	if (married > -1) {
-		marriages [person] [1] [married] += amount;
+		marriages [person] [married] [1] += amount;
 
 		fs.writeFile ("./marriages.json", JSON.stringify (marriages), (error) => {
 			if (error) {
