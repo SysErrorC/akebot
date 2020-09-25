@@ -49,7 +49,7 @@ client.on ("message", message => {
 
 	if (command === "help") {
 		if (! arguments.length) {
-			message.channel.send (`Special-type destroyer number 18, 8th of the Ayanami-class, Akebono. My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use **${prefix}help command_name** to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}help\n${prefix}prefix\n${prefix}waifu\n${prefix}marry\n${prefix}list\n${prefix}8ball or ${prefix}aniball\n${prefix}play\n${prefix}search\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop or ${prefix}leave or ${prefix}clear\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!\nIf you want to contact my shitty admiral to offer suggestions, report bugs, or offer waifu pictures, join my support server at https://discord.gg/hFQQEcZ, you equally shitty admiral! If you want to examine me, you can go to my GitHub at https://github.com/zuiun/akebot, you perverted admiral!`);
+			message.channel.send (`Special-type destroyer number 18, 8th of the Ayanami-class, Akebono. My command prefix is **${prefix}**, but you already knew that, you shitty admiral! You can use **${prefix}help command_name** to find out how to use that command, you stupid admiral! My commands are:\n**${prefix}help\n${prefix}prefix\n${prefix}waifu\n${prefix}marry\n${prefix}list\n${prefix}8ball** or **${prefix}aniball\n${prefix}play\n${prefix}search\n${prefix}info\n${prefix}move\n${prefix}swap\n${prefix}skip\n${prefix}remove\n${prefix}stop** or **${prefix}leave** or **${prefix}clear\n${prefix}queue**\nI also have secret commands, not that I'll tell you what they are, you shitty admiral!\nIf you want to contact my shitty admiral to offer suggestions, report bugs, or offer waifu pictures, join my support server at https://discord.gg/hFQQEcZ, you equally shitty admiral! If you want to examine me, you can go to my GitHub at https://github.com/zuiun/akebot, you perverted admiral!`);
 		} else {
 			var query = prefix + arguments [0];
 
@@ -217,6 +217,7 @@ function waifu (query, message) {
 			const images = database [i] [1];
 
 			message.channel.send (images [Math.floor (Math.random () * images.length)]);
+			addEXP (i, message.member.id, 1);
 			return;
 		}
 	}
@@ -252,7 +253,7 @@ function marry (query, message) {
 	switch (query [0].toLowerCase ()) {
 		case "marry":
 			if (! search) {
-				message.channel.send ("Even though you're a pathetic existence, I'm not going to marry you to the air out of pity, you shitty admiral!");
+				message.channel.send ("Even though you're pathetic, I'm not going to marry you to the air out of pity, you shitty admiral!");
 				return;
 			}
 
@@ -268,10 +269,20 @@ function marry (query, message) {
 						const index = marriages [person].indexOf (search);
 
 						marriages [person].splice (index, 1);
-						message.channel.send (`You've divorced **${search}**, you shitty admiral! Not that your marriage would've worked out anyway!`);
+
+						if (search === "akebono") {
+							message.channel.send ("Why are you divorcing me, huh!? Am I not good enough for you or something!? You shitty admiral!");
+						} else {
+							message.channel.send (`You've divorced **${search}**, you shitty admiral! Not that your marriage would've worked out anyway!`);
+						}
 					} else {
 						marriages [person].push (search);
-						message.channel.send (`You've married **${search}**, you perverted admiral! Why do I have to do the rites!?`);
+						
+						if (search === "akebono") {
+							message.channel.send ("Me!? Marry you!? I bet you just want to see my body, you perverted admiral!");
+						} else {
+							message.channel.send (`You've married **${search}**, you perverted admiral! Why do I have to do the rites!?`);
+						}
 					}
 
 					fs.writeFile ("./marriages.json", JSON.stringify (marriages), (error) => {
@@ -310,6 +321,7 @@ function marry (query, message) {
 
 					message.channel.send (data [2] [Math.floor (Math.random () * data [2].length)]);
 					message.channel.send (data [1] [Math.floor (Math.random () * data [1].length)]);
+					addEXP (i, person, 2);
 					return;
 				}
 			}
@@ -341,16 +353,18 @@ function getMarriage (person) {
 	var marriages = JSON.parse (fs.readFileSync ("./marriages.json", "utf-8"));
 
 	if (marriages [person]) {
-		if (marriages [person].length > 0) {
+		let marriage = marriages [person];
+
+		if (marriage [0].length > 0) {
 			let girls = "";
 
-			for (var i in marriages [person]) {
-				let add = `**${marriages [person] [i]}**`;
+			for (var i in marriage [0]) {
+				let add = `**${marriage [0] [i]}** (**${getLevel (marriage [0] [i], person)}**)`;
 
-				if (i <= marriages [person].length - 2) {
+				if (i <= marriage [0].length - 2) {
 					add += ", ";
 
-					if (i == marriages [person].length - 2) {
+					if (i == marriage [0].length - 2) {
 						add += "and ";
 					}
 				}
@@ -363,6 +377,43 @@ function getMarriage (person) {
 	}
 
 	return "**nobody**";
+}
+
+function isMarried (query, person) {
+	var marriages = JSON.parse (fs.readFileSync ("./marriages.json", "utf-8"));
+
+	if (marriages [person]) {
+		return marriages [person] [0].indexOf (query);
+	}
+
+	return -1;
+}
+
+function getLevel (query, person) {
+	var marriages = JSON.parse (fs.readFileSync ("./marriages.json", "utf-8"))
+	let married = isMarried (query, person);
+
+	if (married > -1) {
+		// TODO: Calculate marriage level
+		return marriages [person] [1] [married];
+	}
+
+	return -1;
+}
+
+function addEXP (query, person, amount) {
+	var marriages = JSON.parse (fs.readFileSync ("./marriages.json", "utf-8"))
+	let married = isMarried (query, person);
+
+	if (married > -1) {
+		marriages [person] [1] [married] += amount;
+
+		fs.writeFile ("./marriages.json", JSON.stringify (marriages), (error) => {
+			if (error) {
+				console.log (error);
+			}
+		});
+	}
 }
 
 function getMention (query) {
@@ -381,6 +432,7 @@ function getMention (query) {
 	}
 }
 
+// Currently deprecated
 function list (message) {
 	var database = JSON.parse (fs.readFileSync ("./database.json", "utf-8"));
 
@@ -705,6 +757,7 @@ function remove (query, message) {
 function stop (message) {
 	queue [message.guild.id] = [];
 	index = 0;
+	loopState = 0;
 
 	if (! connection [message.guild.id]) {
 		message.channel.send ("I can't stop music without being in a voice channel, you stupid admiral!");
