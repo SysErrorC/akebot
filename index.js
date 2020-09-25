@@ -6,8 +6,9 @@ const fs = require ("fs");
 const { Console } = require("console");
 const client = new Discord.Client ();
 
-const waitTime = 10000;
-const talkedRecently = new Set();
+const selectionTime = 15000;
+const waifuTime = 60000;
+const recentAction = new Set ();
 var searching = false;
 var connection = {};
 var queue = {};
@@ -218,7 +219,7 @@ function waifu (query, message) {
 			const images = database [i] [1];
 
 			message.channel.send (images [Math.floor (Math.random () * images.length)]);
-			addEXP (i, message.member.id, 1);
+			addTimerEXP (i, message.member.id, 1);
 			return;
 		}
 	}
@@ -230,6 +231,10 @@ function aliasName (query) {
 	var database = JSON.parse (fs.readFileSync ("./database.json", "utf-8"));
 
 	for (var i in database) {
+		if (i === "random") {
+			continue;
+		}
+
 		for (var j in database [i] [0]) {
 			if (database [i] [0] [j] === query) {
 				return i;
@@ -251,90 +256,89 @@ function marry (query, message) {
 
 	createMarriage (person);
 
-	switch (query [0].toLowerCase ()) {
-		case "marry":
-			if (! search) {
-				message.channel.send ("Even though you're pathetic, I'm not going to marry you to the air out of pity, you shitty admiral!");
-				return;
-			}
-
-			var database = JSON.parse (fs.readFileSync ("./database.json", "utf-8"));
-
-			search = aliasName (search);
-
-			for (var i in database) {
-				if (i === search) {
-					let marriages = JSON.parse (fs.readFileSync ("./marriages.json", "utf-8"));
-
-					if (marriages [person].includes (search)) {
-						const index = marriages [person].indexOf (search);
-
-						marriages [person].splice (index, 1);
-
-						if (search === "akebono") {
-							message.channel.send ("Why are you divorcing me, huh!? Am I not good enough for you or something!? You shitty admiral!");
+	if (search !== "random") {
+		switch (query [0].toLowerCase ()) {
+			case "marry":
+				if (! search) {
+					message.channel.send ("Even though you're pathetic, I'm not going to marry you to the air out of pity, you shitty admiral!");
+					return;
+				}
+	
+				var database = JSON.parse (fs.readFileSync ("./database.json", "utf-8"));
+	
+				search = aliasName (search);
+	
+				for (var i in database) {
+					if (i === search) {
+						let marriages = JSON.parse (fs.readFileSync ("./marriages.json", "utf-8"));
+	
+						if (marriages [person].includes (search)) {
+							const index = marriages [person].indexOf (search);
+	
+							marriages [person].splice (index, 1);
+	
+							if (search === "akebono") {
+								message.channel.send ("Why are you divorcing me, huh!? Am I not good enough for you or something!? You shitty admiral!");
+							} else {
+								message.channel.send (`You've divorced **${search}**, you shitty admiral! Not that your marriage would've worked out anyway!`);
+							}
 						} else {
-							message.channel.send (`You've divorced **${search}**, you shitty admiral! Not that your marriage would've worked out anyway!`);
+							marriages [person].push (search);
+							
+							if (search === "akebono") {
+								message.channel.send ("Me!? Marry you!? I bet you just want to see my body, you perverted admiral!");
+							} else {
+								message.channel.send (`You've married **${search}**, you perverted admiral! Why do I have to do the rites!?`);
+							}
 						}
-					} else {
-						marriages [person].push (search);
-						
-						if (search === "akebono") {
-							message.channel.send ("Me!? Marry you!? I bet you just want to see my body, you perverted admiral!");
-						} else {
-							message.channel.send (`You've married **${search}**, you perverted admiral! Why do I have to do the rites!?`);
-						}
+	
+						fs.writeFile ("./marriages.json", JSON.stringify (marriages), (error) => {
+							if (error) {
+								console.log (error);
+							}
+						});
+						return;
 					}
-
-					fs.writeFile ("./marriages.json", JSON.stringify (marriages), (error) => {
-						if (error) {
-							console.log (error);
-						}
-					});
-					return;
 				}
-			}
-
-			break;
-		case "view":
-			let araragi = getMention (search);
-
-			if (araragi) {
-				message.channel.send (`<@${araragi}> is married to ${getMarriage (araragi)}, you shitty admiral! Don't pry into other peoples' lives!`);
-			} else {
-				message.channel.send (`You're married to ${getMarriage (person)}, you stupid admiral! How did you manage to forget that!?`);
-			}
-
-			return;
-		case "fun":
-			if (! search) {
-				message.channel.send ("You need to ask for a marriage partner, you perverted admiral!");
+	
+				break;
+			case "view":
+				let araragi = getMention (search);
+	
+				if (araragi) {
+					message.channel.send (`<@${araragi}> is married to ${getMarriage (araragi)}, you shitty admiral! Don't pry into other peoples' lives!`);
+				} else {
+					message.channel.send (`You're married to ${getMarriage (person)}, you stupid admiral! How did you manage to forget that!?`);
+				}
+	
 				return;
-			}
-
-			var database = JSON.parse (fs.readFileSync ("./database.json", "utf-8"));
-
-			search = aliasName (search);
-
-			for (var i in database) {
-				if (i === search) {
-					let data = database [i];
-
-					message.channel.send (data [2] [Math.floor (Math.random () * data [2].length)]);
-					message.channel.send (data [1] [Math.floor (Math.random () * data [1].length)]);
-					talkedRecently.add(msg.author.id);
-					setTimeout(() => {talkedRecently.delete(msg.author.id);}, 60000);
-						addEXP (i, person, 2);
-					if(!talkedRecently.has(msg.author.id))
+			case "fun":
+				if (! search) {
+					message.channel.send ("You need to ask for a marriage partner, you perverted admiral!");
 					return;
 				}
-			}
-
-			message.channel.send (`You're not married to **${search}**, you stupid admiral!`);
-			break;
-		default:
-			message.channel.send (`**${query [0]}** isn't a valid action, you stupid admiral!`);
-			return;
+	
+				var database = JSON.parse (fs.readFileSync ("./database.json", "utf-8"));
+	
+				search = aliasName (search);
+	
+				for (var i in database) {
+					if (i === search) {
+						let data = database [i];
+	
+						message.channel.send (data [2] [Math.floor (Math.random () * data [2].length)]);
+						message.channel.send (data [1] [Math.floor (Math.random () * data [1].length)]);
+						addTimerEXP (i, person, 2);
+						return;
+					}
+				}
+	
+				message.channel.send (`You're not married to **${search}**, you stupid admiral!`);
+				break;
+			default:
+				message.channel.send (`**${query [0]}** isn't a valid action, you stupid admiral!`);
+				return;
+		}
 	}
 
 	message.channel.send (`**${search}** isn't one of the waifus in my database, you shitty admiral!`);
@@ -363,7 +367,8 @@ function getMarriage (person) {
 			let girls = "";
 
 			for (var i in marriage) {
-				let add = `**${marriage [i] [0]}** (**${getLevel (marriage [i] [0], person)}**)`;
+				let exp = getEXP (marriage [i] [0], person);
+				let add = `**${marriage [i] [0]}** (**${getLevel (exp)}** [**${exp}**])`;
 
 				if (i <= marriage.length - 2) {
 					add += ", ";
@@ -397,24 +402,33 @@ function isMarried (query, person) {
 	return -1;
 }
 
-function getLevel (query, person) {
+function getEXP (query, person) {
 	var marriages = JSON.parse (fs.readFileSync ("./marriages.json", "utf-8"))
 	let married = isMarried (query, person);
 
 	if (married > -1) {
-		if(marriages [person] [married] [1])< 10)
-		return "simp";
-		if(marriages [person] [married] [1])< 20)
-		return "fan";
-		if(marriages [person] [married] [1])< 40)
-		return "lover";
-		if(marriages [person] [married] [1])< 80)
-		return "connoisseur";
-		if(marriages [person] [married] [1])< 160)
-		return "cultist";
+		return marriages [person] [married] [1];
 	}
 
 	return -1;
+}
+
+function getLevel (exp) {
+	if (exp < 10) {
+		return `Simp`;
+	} else if (exp < 20) {
+		return `Fan`;
+	} else if (exp < 40) {
+		return `Lover`;
+	} else if (exp < 80) {
+		return `Connoisseur`;
+	} else if (exp < 160) {
+		return `Cultist`;
+	} else if (exp < 320) {
+		return `High Priest`;
+	} else {
+		return `Evangelist`;
+	}
 }
 
 function addEXP (query, person, amount) {
@@ -429,6 +443,14 @@ function addEXP (query, person, amount) {
 				console.log (error);
 			}
 		});
+	}
+}
+
+function addTimerEXP (query, person, amount) {
+	if (! recentAction.has (person)) {
+		recentAction.add (person);
+		setTimeout (() => recentAction.delete (person), waifuTime);
+		addEXP (query, person, amount);
 	}
 }
 
@@ -525,9 +547,9 @@ async function execute (query, message, search) {
 
 		listQueue (message, songs, true);
 
-		const collector = message.channel.createMessageCollector (response => response.author.id === message.author.id, { time: waitTime });
+		const collector = message.channel.createMessageCollector (response => response.author.id === message.author.id, { time: selectionTime });
 
-		message.channel.send (`You have ${waitTime / 1000} seconds to make a choice, you shitty admiral!`);
+		message.channel.send (`You have ${selectionTime / 1000} seconds to make a choice, you shitty admiral!`);
         collector.on ("collect", response => {
 			var index = parseInt (response, 10);
 
